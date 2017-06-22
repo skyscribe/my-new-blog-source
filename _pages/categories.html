@@ -1,0 +1,19 @@
+---
+layout: archive
+permalink: /categories/
+title: "Posts by Category"
+author_profile: true
+---
+
+{% include group-by-array collection=site.posts field="categories" %}
+
+<ul>
+{% for category in group_names %}
+    {% assign posts = group_items[forloop.index0] %}
+    {% if posts.size > 0 %}
+        <li>
+              <a href="{{site.baseurl}}{{ category | downcase | prepend: '/categories/' | append: '/index.html'}}">{{ category }}({{posts | size}})</a>
+        </li>
+    {% endif %}
+{% endfor %}
+</ul>
