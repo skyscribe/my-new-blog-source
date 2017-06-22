@@ -10,8 +10,9 @@ setup:
 	mkdir $(deployDir) 
 	cd $(deployDir)
 	git init
-	git commit -m "init jekyll static site"
-	git branch -m gh-pages
+	echo "Dummy content" > index.html
+	git add .
+	git commit -m "dummy script init"
 	git remote add origin $(siteUrl)
 	echo "setup completed for $(deployDir)"
 
