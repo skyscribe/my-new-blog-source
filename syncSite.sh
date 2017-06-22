@@ -17,6 +17,7 @@ function setup() {
 }
 
 function deploy() {
+    bundle exec jekyll build
     cd "$deployDir"
     cp -r "$siteDir"/* "$deployDir/"
     git pull origin master

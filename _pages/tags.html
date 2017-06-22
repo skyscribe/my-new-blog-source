@@ -8,14 +8,18 @@ author_profile: true
 {% include group-by-array collection=site.posts field="tags" %}
 
 {% for tag in group_names %}
-  {% assign posts = group_items[forloop.index0] %}
-  <h2 id="{{ tag | slugify }}" class="archive__subtitle">{{ tag }}</h2>
-  <ul>
-  {% for post in posts %}
+{% assign posts = group_items[forloop.index0] %}
+<h2 id="{{ tag | slugify }}" class="archive__subtitle">
+    <a href="{{site.baseurl}}/tags/{{tag}}/index.html">{{ tag }}</a>
+</h2>
+<ul>
+    {% for post in posts %}
     <li>
-        <a.href="{{ post.url | remove_first:'/' }}">{{ post.title }}</a>
-        <div class="postDate">{{ post.date | date: "%B %d, %Y" }}</div>
+        <div>
+            <a href="{{site.baseurl}}{{ post.url }}">{{post.title | strip }}</a>
+            <div class="postDate">{{ post.date | date: "%B %d, %Y" }}</div>
+        </div>
     </li>
-  {% endfor %}
-  </ul>
+    {% endfor %}
+</ul>
 {% endfor %}
