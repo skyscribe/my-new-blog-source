@@ -13,6 +13,7 @@ setup:
 	git commit -m "init jekyll static site"
 	git branch -m github-pages
 	git remote add origin $(siteUrl)
+	echo "setup completed for $(deployDir)"
 
 deploy:
 	cd $(deployDir)
