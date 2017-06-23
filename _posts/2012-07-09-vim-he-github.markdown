@@ -3,7 +3,7 @@ layout: post
 title: "vim 和 Github"
 date: 2012-07-09 20:14
 comments: true
-categories: [vim, tips, tools]
+categories: [tools]
 ---
 
 vim之所有被成为Unix程序员的两大神器之一，就是因为其强大的插件机制；但是传统的插件更新方式需要手工去[插件网站](http://www.vim.org/scripts/)下载，并且释放到**$HOME/.vim**目录下边，然后解压缩，定制选项等等。这样的好处是，当你需要到一台新的机器上工作的时候，不管这台机器有没有你的插件，只需要将你自己的插件目录全部打包/复制/覆盖就好了。

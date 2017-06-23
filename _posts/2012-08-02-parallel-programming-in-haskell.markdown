@@ -3,7 +3,7 @@ layout: post
 title: "Parallel programming in Haskell"
 date: 2012-08-02 20:55
 comments: true
-categories: [haskell, concurrency, performance, tips, 学习笔记]
+categories: [notes, design, programming]
 ---
 
 Parallel和Concurrency的目标是一致的，然后Parallel更强调在多个物理并发处理单元（至少从OS之上的角度看如此）存在的情况下，如何最大限度地利用现有的CPU资源提高程序的性能。传统的过程式编程思维范式中，所有的操作都是顺行串行的，多核并发处理往往意味着需要对代码做大幅度的修改；而Haskell的并行编程则因为其**Lazy Evaluation**特性而变得简单许多 - 基于现有的代码做一些相对细微的改动就可以使得某些操作并行起来。同样由于这一Lazy特性和表达式赋值的灵活性，很多隐晦的问题也很容易随之而生。Haskell通过提供Strategy抽象将赋值策略和实际算法隔离开来，从而灵活的解决了Lazy带来的副作用。

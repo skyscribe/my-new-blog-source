@@ -3,7 +3,7 @@ layout: post
 title: "UNIX神器之awk/gawk"
 date: 2011-01-02 20:32
 comments: true
-categories: [awk, tips, tools]
+categories: [linux, tools]
 tags: [awk, programming, gawk, UNIX]
 ---
 

@@ -3,7 +3,7 @@ layout: post
 title: "CMake的一些小经验"
 date: 2009-12-14 14:11
 comments: true
-categories: [tips, cmake, build]
+categories: [tips, build]
 tags: [cmake, build]
 ---
 

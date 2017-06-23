@@ -3,7 +3,7 @@ layout: post
 title: "Haskell regular expression"
 date: 2012-03-30 22:16
 comments: true
-categories: [haskell, regexp] 
+categories: [haskell, programming] 
 ---
 
 正则表达式是文本解析处理的一大利器，因而大部分程序语言都以库的方式提供支持。在Haskell中，有多种不同的实现可供使用，详细看参考[wiki](http://www.haskell.org/haskellwiki/Regular_expressions), 他们的效率和支持的特性有些微的差异。但是作为一种**强类型**的**静态**/函数式语言，haskell的正则匹配可以借助返回值类型多态提供灵活的匹配结果。

@@ -3,7 +3,7 @@ layout: post
 title: "Haskell Functor &amp; Monad"
 date: 2012-04-15 21:11
 comments: true
-categories: [haskell, functor, monad]
+categories: [haskell, fp, programming]
 ---
 
 作为一种函数式语言，haskell提供了各种高级的函数编程抽象支持：Functor抽象了那些作用于**函数（或者类型封装）内的数据的操作并且将其运算结果用对应函数封装的抽象运算**, 其核心是提供了**Functor** typeclass 和 **fmap**操作。

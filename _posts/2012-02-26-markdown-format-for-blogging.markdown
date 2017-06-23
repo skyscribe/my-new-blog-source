@@ -3,7 +3,7 @@ layout: post
 title: "markdown format for blogging"
 date: 2012-02-26 15:01
 comments: true
-categories: [study, markdown]
+categories: [study, notes, doc]
 tags: [minutes, markdown]
 ---
 

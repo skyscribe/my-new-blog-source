@@ -3,7 +3,7 @@ layout: post
 title: "The productive Programmer - 笔记"
 date: 2013-08-06 20:24
 comments: true
-categories: [reading, programming, tools, tips]
+categories: [ programming, tools, tips]
 ---
 
 这是一本关于程序员生产效率的书，作者来自于Thought Works - 很多人一听到这个公司的名字就会在头脑中联系到敏捷/布道师这样的角色，并且可能在心里暗暗的寻思，又是一个光说不练的家伙在传播他们的理论了。但是仔细读来，才会发现这本书其实和敏捷并没有太大关联，讲述的也是一些实实在在的建议和实践。

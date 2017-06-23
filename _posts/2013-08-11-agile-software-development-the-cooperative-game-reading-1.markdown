@@ -3,7 +3,7 @@ layout: post
 title: "Agile software development - The cooperative game - 笔记 - part1"
 date: 2013-08-11 09:52
 comments: true
-categories: [reading, software, engineering, agile, methodologies]
+categories: [ engineering, notes ]
 ---
 
 这本书的中文译名是一个平淡无奇的<<敏捷软件开发>>，这个名字是如此的平庸以至于放在书架上不会有几个人注意到它真正的价值，除非你仔细的阅读了书面封底的作者介绍和英文原版所获得的荣耀 - 17届Jolt大奖获奖作品；而Cockburn大师本身又属于一个人能连续两次获得Jolt的技术作家之一；但是能够在连续两年中获得两次Jolt大奖的，估计又少之又少了。

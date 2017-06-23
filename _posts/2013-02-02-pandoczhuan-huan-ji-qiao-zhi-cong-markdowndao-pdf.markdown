@@ -3,7 +3,7 @@ layout: post
 title: "Pandoc转换技巧之从markdown到PDF"
 date: 2013-02-02 20:52
 comments: true
-categories: [pandoc, markdown, pdf, latex, doc]
+categories: [tools, doc]
 ---
 
 用Pandoc这一神器可以实现N多文档格式的转换，这里仅记录一些小技巧。

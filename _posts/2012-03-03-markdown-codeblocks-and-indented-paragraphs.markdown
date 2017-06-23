@@ -3,7 +3,7 @@ layout: post
 title: "Markdown codeblocks and indented paragraphs"
 date: 2012-03-03 10:25
 comments: true
-categories: [markdown, tips]
+categories: [doc, tips]
 ---
 
 ## 错落的格式

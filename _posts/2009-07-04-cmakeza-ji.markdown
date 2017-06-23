@@ -3,7 +3,7 @@ layout: post
 title: "cmake杂记"
 date: 2009-07-04 13:15
 comments: true
-categories: [cmake, tips, build]
+categories: [tools, build]
 ---
 
 CMake常用技巧：

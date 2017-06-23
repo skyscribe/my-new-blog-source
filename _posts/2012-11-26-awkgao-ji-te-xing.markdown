@@ -3,7 +3,7 @@ layout: post
 title: "awk高级特性"
 date: 2012-11-26 19:49
 comments: true
-categories: awk, regexp, array, unix
+categories: [programming, tools, linux]
 ---
 
 UNIX环境下，用shell做一些常见的文本处理工作是很方便高效的事情；虽然目前有很多自带丰富类库的脚本语言可以完成同样的事情，但是对于一些特殊的文本格式处理任务，传统的sed/awk/grep组合还是有很明显的优势：没有复杂的版本问题和类库部署依赖问题，能够快速解决问题。awk作为一门**DSL**，自身也带有对很多**高级特性**（相对于shell本身）的支持，灵活应用往往能收到奇效。

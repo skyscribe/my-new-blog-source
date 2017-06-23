@@ -3,7 +3,7 @@ layout: post
 title: "Haskell Functor/Applicative Functor"
 date: 2012-04-18 20:19
 comments: true
-categories: [haskell, monad, functional]
+categories: [haskell, fp, programming]
 ---
 
 Haskell中存在三种层次的函数过程抽象，依据约束的多少分别有 Functor， Applicative 和 Monad。Functor是一种最基本的调用提升，通过`fmap`可以将传入参数函数作用于所wrapper的type；而Applicative和Monad则定义了更多的运算符和原子函数等。

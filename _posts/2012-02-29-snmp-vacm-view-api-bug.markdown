@@ -3,7 +3,7 @@ layout: post
 title: "snmp vacm view API的一个小bug"
 date: 2012-02-29 20:40
 comments: true
-categories: [snmp, C, tips]
+categories: [programming, tips]
 tags: [snmp, tips]
 ---
 

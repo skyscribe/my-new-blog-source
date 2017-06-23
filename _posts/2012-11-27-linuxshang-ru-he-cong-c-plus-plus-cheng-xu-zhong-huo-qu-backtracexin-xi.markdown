@@ -3,7 +3,7 @@ layout: post
 title: "Linux上如何从C++程序中获取backtrace信息"
 date: 2012-11-27 21:41
 comments: true
-categories: [linux, c, cpp, debug, backtrace]
+categories: [linux, debugging, tools]
 tags: [linux, debug, cpp]
 ---
 

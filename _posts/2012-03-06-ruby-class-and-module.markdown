@@ -3,7 +3,8 @@ layout: post
 title: "ruby学习笔记-4 class&amp;module"
 date: 2012-03-06 22:48
 comments: true
-categories: [学习笔记, ruby]
+categories: [ ruby]
+categories: [ ruby]
 ---
 
 Class和Module是Ruby中的两个重要概念。作为一个纯**OO**语言，class的概念自然容易理解，即为object的抽象；而module则明显有别于其它语言地提供了mixin方法来解决多继承缺失带来的不便 - 集成多个基类的接口并维持[IS-A关系](http://en.wikipedia.org/wiki/Is-a)以及[LSP替换](http://en.wikipedia.org/wiki/Liskov_substitution_principle).

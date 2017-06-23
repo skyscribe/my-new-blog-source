@@ -3,7 +3,7 @@ layout: post
 title: "Github pages upgrade"
 date: 2013-08-04 23:07
 comments: true
-categories: github
+categories: blog
 ---
 
 GitHub的后台发生了更新，原来的**github.com**换成了**github.io**，导致原来的**octopress**的Rakefile变得不能正常工作。

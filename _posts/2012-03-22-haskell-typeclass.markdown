@@ -3,7 +3,7 @@ layout: post
 title: "Haskell typeclass"
 date: 2012-03-22 20:15
 comments: true
-categories: [haskell, type]
+categories: [programming, notes, haskell]
 ---
 
 Haskell 中也有class关键字，但其目的却和 OO 中的类有着巨大的差别。在 OO 世界中，类用来描述一大堆具有共同数据和行为的对象的抽象；而 Haskell 中的 class 则是用于抽象提供同样函数接口的数据类型。每一个 ADT 都可以用`instance`来生命其满足某个 class 并且给出对应于具体函数的实现，即 class 在 Haskell 中实际用于约束数据类型，因而又被成为 typeclass.

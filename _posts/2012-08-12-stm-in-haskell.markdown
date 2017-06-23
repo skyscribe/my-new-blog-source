@@ -3,7 +3,7 @@ layout: post
 title: "STM in Haskell"
 date: 2012-08-12 09:54
 comments: true
-categories: [haskell, 学习笔记, concurrency]
+categories: [notes, programming, design, haskell]
 ---
 
 传统的并发变成模型通过Mutex/Conditional Variable/Semaphore的设施来控制对共享资源的访问控制，但是这一经典模型使得编写**正确高效**的并发程序变得异常困难：  

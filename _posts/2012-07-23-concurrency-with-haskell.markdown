@@ -3,7 +3,7 @@ layout: post
 title: "Concurrency with Haskell"
 date: 2012-07-23 19:49
 comments: true
-categories: [haskell, 学习笔记, concurrency]
+categories: [notes, programming, design, haskell, fp]
 ---
 
 随着基于CPU频率的摩尔定律的失效，现代的计算机体系都采用多核的方式提高处理能力，传统的编程思维和模式在多核时代则遭遇越来越多的问题；而函数式编程则在很大程度上提供了完全不同但是更为优雅的思路。作为纯函数式编程语言，Haskell的并发编程则和传统的过程式语言有着明显的不同。

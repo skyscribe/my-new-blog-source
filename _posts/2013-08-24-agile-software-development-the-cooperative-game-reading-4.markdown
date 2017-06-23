@@ -3,7 +3,7 @@ layout: post
 title: "Agile software development - the cooperative game - 笔记 - 4"
 date: 2013-08-24 19:32
 comments: true
-categories: [reading, software, engineering, agile, methodologies]
+categories: [ engineering, notes]
 ---
 
 本文是第四部分，主要讨论方法论和方法设计的一些基本规则，已经如何清晰地**定制和应用**这些规则。

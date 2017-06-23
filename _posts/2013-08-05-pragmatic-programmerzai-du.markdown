@@ -3,7 +3,7 @@ layout: post
 title: "Pragmatic Programmer再读"
 date: 2013-08-05 21:18
 comments: true
-categories: [programming,reading]
+categories: [programming,notes,engineering]
 ---
 
 这是一本讲述程序员开发哲学和思想的书，虽然出版了十余年仍然没有太多过时的东西，因为讲述的内容是一些永远不会过时的东西（至少从计算机程序设计职业化-即所谓的软件工程开启的时间算便是如此）。

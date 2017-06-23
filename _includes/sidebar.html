@@ -1,5 +1,5 @@
 {% if page.author_profile or layout.author_profile or page.sidebar %}
-  <div class="sidebar sticky">
+  <div class="sidebar__right sticky">
   {% if page.author_profile or layout.author_profile %}{% include author-profile.html %}{% endif %}
 
   {% include tagcloud.html %}
@@ -23,4 +23,5 @@
     {% endif %}
   {% endif %}
   </div>
+
 {% endif %}

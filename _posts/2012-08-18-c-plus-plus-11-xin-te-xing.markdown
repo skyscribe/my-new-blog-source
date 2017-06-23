@@ -3,7 +3,7 @@ layout: post
 title: "c++11 新特性1 语言特性改进"
 date: 2012-08-18 10:03
 comments: true
-categories: [cpp, clang, llvm, tips, cpp11, 学习笔记]
+categories: [cpp, programming, notes ] 
 ---
 
 **C++11**(C++0x)[定稿](http://herbsutter.com/2011/10/10/iso-c11-published/)已经满一年，主要的编译器这次跟进的速度也相当快，其中支持最好的要属最近声名雀起的[llvm](http://llvm.org/);作为一个历时8年之久的ISO标准，其诞生过程虽然过程很曲折，但是新标准对C++的改进和生产效率的提高无疑是大有益处的。

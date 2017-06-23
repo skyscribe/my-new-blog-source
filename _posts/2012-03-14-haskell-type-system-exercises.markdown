@@ -3,7 +3,7 @@ layout: post
 title: "Haskell type system exercises"
 date: 2012-03-14 22:16
 comments: true
-categories: [haskell, study, 学习笔记]
+categories: [programming, notes]
 ---
 
 Haskell的类型系统是**强类型**的，并且没有任何强制类型转换。所有的类型检查均在编译器做检查。定义新的数据类型之后，即使它们内在的数据结构完全一样，也是完全不同的数据类型，不能混用。

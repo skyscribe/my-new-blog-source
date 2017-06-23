@@ -3,7 +3,7 @@ layout: post
 title: "Linux man手册相关小技巧"
 date: 2012-12-04 20:55
 comments: true
-categories: [linux, tips, tools, man]
+categories: [linux, doc, tools]
 ---
 
 Linux下的编程实践中,man手册页的作用是不可小视的，每一个高效的Linux程序员必然往往也具备快速的通过man手册页找到所需文档的能力。本文是一些关于man手册使用中的一些小技巧总结。

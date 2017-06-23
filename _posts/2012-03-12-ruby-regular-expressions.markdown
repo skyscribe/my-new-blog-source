@@ -3,7 +3,7 @@ layout: post
 title: "Ruby 学习笔记 6 - 正则表达式"
 date: 2012-03-12 19:37
 comments: true
-categories: [ruby, 学习笔记, regexp]
+categories: [ruby, programming, notes]
 ---
 
 文本处理是Python/Ruby这类脚本语言的重头戏之一，而强大的正则表达式支持对于文本处理来说也是必不可少的。Ruby的设计很多方面沿袭perl，正则表达式方面也不例外。

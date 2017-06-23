@@ -3,7 +3,7 @@ layout: post
 title: "wireshark解密SNMPv3-DH包"
 date: 2009-07-27 22:24
 comments: true
-categories: [wireshark, tools, tips, debugging]
+categories: [tools, debugging]
 tags: [wireshark, tools, tips, linux]
 ---
 

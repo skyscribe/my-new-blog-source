@@ -3,7 +3,7 @@ layout: post
 title: "C++新特性3 - Lambda支持"
 date: 2012-08-26 11:23
 comments: true
-categories: [cpp, cpp11, 学习笔记]
+categories: [cpp, programming, notes]
 ---
 
 **lambda表达式(closure)**是C++11中新引入的对程序组织构造改进最大的特性之一；这一特性并不是一个新的概念（几十年前的函数式于样都提供了该特性），然而对于一个深受*过程式思维*影响的语言而言，lambda的支持则极大提高了代码的抽象能力和可读性。

@@ -3,7 +3,7 @@ layout: post
 title: "Type/data/newtype in Haskell"
 date: 2012-04-24 22:19
 comments: true
-categories: [haskell, type]
+categories: [haskell, notes]
 ---
 
 Haskell提供了抽象代数类型（Algebra Data Type）来完成对数据的封装；其中最直观的是 data 关键字声明，可以用C/C++中的struct/class 来类比。此外，我们还可以用 type 和 newtype 来定义一些数据抽象。type所定义的就是一个已有类型的别名，其主要作用就是为了提高代码的可读性，更清晰的传达代码的意图；而newtype则有一些细微的差异和特殊作用。

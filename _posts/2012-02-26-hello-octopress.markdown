@@ -3,7 +3,7 @@ layout: post
 title: "hello octopress"
 date: 2012-02-26 13:58
 comments: true
-categories: [blogging, study, markdown] 
+categories: [blog, study, doc, tools] 
 tags: [octopress, minutes, languages, programming]
 ---
 

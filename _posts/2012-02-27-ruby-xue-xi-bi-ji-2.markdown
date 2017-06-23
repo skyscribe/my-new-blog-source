@@ -3,7 +3,7 @@ layout: post
 title: "ruby学习笔记-2"
 date: 2012-02-27 20:36
 comments: true
-categories: [ruby, 学习笔记]
+categories: [ruby, notes]
 tags: [study, ruby, language]
 ---
 

@@ -3,7 +3,7 @@ layout: post
 title: "PyQt学习小笔记"
 date: 2013-02-24 09:39
 comments: true
-categories: [pyqt, qt, python, GUI]
+categories: [programming, python, tools]
 ---
 
 PyQT是知名跨平台框架QT的python绑定；用它来做些小程序既可以利用QT的跨平台性又能利用python强大的表达能力,从而取得事半功倍的效果。下边是使用它开发一个小程序过程中的学习小笔记。

@@ -4,7 +4,7 @@ title: "C++11新特性2-RValue Reference 与 Move"
 date: 2012-08-19 09:40
 comments: true
 toc: true
-categories: [cpp, tips, cpp11, 学习笔记]
+categories: [cpp, programming, notes]
 ---
 
 现有的C++03标准中，不必要的对象的拷贝和临时对象的构造经常会造成额外的性能开销（即使有*返回值优化*这样的编译器优化来帮忙也不能解决好多情况的问题）；新的C++11标准通过对语言的修正，引入了**RValue Reference**和**Move**来解决这一问题。

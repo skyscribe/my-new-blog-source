@@ -3,7 +3,7 @@ layout: post
 title: "Agile software development - the cooperative game - 笔记 - 3"
 date: 2013-08-14 20:32
 comments: true
-categories: [reading, software, engineering, agile, methodologies]
+categories: [ engineering, notes]
 ---
 
 本文是第三部分。

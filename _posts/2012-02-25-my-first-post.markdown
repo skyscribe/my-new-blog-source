@@ -3,7 +3,7 @@ layout: post
 title: "My first post"
 date: 2012-02-25 23:32
 comments: true
-categories: hello
+categories: blog
 tags: [study, hello]
 ---
 

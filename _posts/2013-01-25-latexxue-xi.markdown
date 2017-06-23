@@ -3,7 +3,7 @@ layout: post
 title: "latex初探"
 date: 2013-01-25 21:43
 comments: true
-categories: [latex, tex, doc, pandoc, markdown]
+categories: [tools, doc]
 ---
 
 文档悖论

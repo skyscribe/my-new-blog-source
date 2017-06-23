@@ -3,7 +3,7 @@ layout: post
 title: "haskell函数式编程"
 date: 2012-03-17 20:49
 comments: true
-categories: [haskell, functional]
+categories: [programming, haskell, fp]
 ---
 
 作为纯函数式语言，haskell的主要特征之一即是提供丰富的函数式变成设施，包括 recursion / composition / lambda / partial & currying 等。Haskell本身的强类型约束和延迟赋值，使得其函数式风格明显区别于流行的 ruby/python 等其它语言。
