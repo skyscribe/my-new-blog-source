@@ -60,8 +60,8 @@ analytics:
 # Site Author
 author:
   name             : "Fei Yan"
-  avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "An curious programmer"
+  avatar           : "/assets/images/me.jpg"# path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  bio              : "A curious programmer"
   location         : "Hangzhou"
   email            : "skyscribe.yf@gmail.com"
   uri              :
@@ -71,18 +71,18 @@ author:
   flickr           :
   facebook         :
   foursquare       :
-  github           :
+  github           : skyscribe
   google_plus      :
   keybase          :
   instagram        :
   lastfm           :
-  linkedin         :
+  linkedin         : skyscribe
   pinterest        :
   soundcloud       :
-  stackoverflow    : # "123456/username" (the last part of your profile url, e.g. http://stackoverflow.com/users/123456/username)
+  stackoverflow    : "222167/fei" # "123456/username" (the last part of your profile url, e.g. http://stackoverflow.com/users/123456/username)
   steam            :
   tumblr           :
-  twitter          :
+  twitter          : "skyscribe"
   vine             :
   weibo            :
   xing             :

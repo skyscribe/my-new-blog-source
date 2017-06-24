@@ -1,10 +1,10 @@
 # main links
 main:
-  - title: "About"
-    url: /about/
   - title: "Posts"
     url: /year-archive/index.html
   - title: "Tags"
     url: /tags/index.html
   - title: "Categories"
     url: /categories/index.html
+  - title: "About"
+    url: /about/
