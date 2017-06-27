@@ -11,7 +11,7 @@ title                    : "驭风万里无垠"
 title_separator          : "-"
 name                     : "skyscribe"
 description              : "汇小流以成江海，积跬步以至千里"
-url                      : "https://skyscribe.github.io" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
+url                      : "http://www.skyscribe.me" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
 repository               : "skyscribe/skyscribe" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
@@ -52,9 +52,9 @@ twitter:
 
 # Analytics
 analytics:
-  provider               : false # false (default), "google", "google-universal", "custom"
+  provider               : "google" # false (default), "google", "google-universal", "custom"
   google:
-    tracking_id          :
+    tracking_id          : UA-29541952-1
 
 
 # Site Author
@@ -154,7 +154,7 @@ sass:
 
 # Outputting
 permalink: /post/:year/:month/:day/:title/
-paginate: 12 # amount of posts to show
+paginate: 5 # amount of posts to show
 paginate_path: /page:num/
 timezone: # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
