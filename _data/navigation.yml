@@ -1,10 +1,24 @@
 # main links
 main:
-  - title: "Posts"
+  - title: "编程相关"
+    url: /categories/programming/index.html
+  - title: "个人笔记"
+    url: /categories/notes/index.html
+  - title: "工具相关"
+    url: /categories/tools/index.html
+  - title: "软件工程"
+    url: /categories/engineering/index.html
+  - title: "软件设计"
+    url: /categories/design/index.html
+  - title: "Haskell"
+    url: /categories/haskell/index.html
+  - title: "C++"
+    url: /categories/cpp/index.html
+  - title: "按年份归档"
     url: /year-archive/index.html
-  - title: "Tags"
+  - title: "标签汇总"
     url: /tags/index.html
-  - title: "Categories"
+  - title: "所有分类"
     url: /categories/index.html
-  - title: "About"
+  - title: "关于..."
     url: /about/

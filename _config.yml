@@ -166,6 +166,8 @@ gems:
   - jekyll-gist
   - jekyll-feed
   - jekyll-archives
+  - jekyll-plantuml
+  - jekyll-related-posts
   - jemoji
 
 # mimic GitHub Pages with --safe
@@ -228,3 +230,6 @@ defaults:
       comments:  true
       share: true
       related: true
+
+# Github metadata from https://github.com/DIYbiosphere/sphere/issues/140
+github: [metadata]
