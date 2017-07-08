@@ -10,6 +10,5 @@ group :jekyll_plugins do
     gem "jekyll-archives"
     gem "jekyll-compose"
     gem "jekyll-plantuml"
-    gem "jekyll-related-posts"
     gem "jemoji"
 end

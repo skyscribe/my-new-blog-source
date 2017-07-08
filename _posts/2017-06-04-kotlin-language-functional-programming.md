@@ -3,8 +3,8 @@ layout: post
 title: Kotlin语言之函数式编程
 date: 2017-06-04 22:32
 comments: true
-categories: [kotlin, programming, fp]
-tags: [kotlin, programming, fp]
+categories: [language, programming, fp]
+tags: [kotlin, programming, language, fp]
 ---
 
 [Kotlin语言](https://kotlinlang.org/)是大名鼎鼎的JetBrains公司（就是可以甩Eclipse数条大街的IntelliJ IDEA背后的公司）出品的现代的编程语言，之前已经在IDEA中蹦达出来很多次了；只是最近随着Google在其[2017年的I/O大会上将其列为Android平台官方支持的语言](https://techcrunch.com/2017/05/17/google-makes-kotlin-a-first-class-language-for-writing-android-apps/)而窜上了热点。

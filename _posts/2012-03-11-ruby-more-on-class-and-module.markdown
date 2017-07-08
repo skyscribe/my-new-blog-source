@@ -3,8 +3,8 @@ layout: post
 title: "ruby 学习笔记 5 - class&module&methods"
 date: 2012-03-11 20:45
 comments: true
-categories: [ ruby]
-categories: [ ruby]
+categories: [programming, language, notes]
+tags: [ ruby, programming, language]
 ---
 
 和其它的面向对象语言类似，ruby的类方法也分为_class method_ 和 _instance method_, **module**和**class**具有相当大程度的相似性, 但是用于重用module中定义的方法时( 同样也有 class method 和 instance method 之分 )，又有一些微妙的差异。

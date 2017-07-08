@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Excessive null checks in Java Defensive Programming?
-categories: [programming, java]
-tags: [programming, java, design, patterns, fp]
+categories: [programming, language, design]
+tags: [programming, java, design, patterns, fp, language]
 ---
 
 最近在参与某开发小组的[团体代码审查](https://atendesigngroup.com/blog/group-code-reviews)会的时候，发现组内的一线开发工程师对于何时应该做空指针检查并没有很清晰的认识；然而这在Java社区里早已经是个老生常谈的争论 。

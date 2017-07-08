@@ -3,7 +3,8 @@ layout: post
 title: "Python中根据不同参数组合产生单独的test case的一种方法"
 date: 2009-10-12 21:20
 comments: true
-categories: [python, test, tools]
+categories: [test, tools]
+tags: [python, test, tools]
 ---
 
 Python自带的unittest和test两个模块为编写test case提供了很灵活的支持，最常用的情况就是继承自unittest.TestCase类，然后对每一个要进行测试的行为写一个test_开头的类成员函数，最后可以利用test.test_support.run_unittest函数跑所有的test case.

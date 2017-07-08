@@ -3,8 +3,8 @@ layout: post
 title: "ruby学习笔记-1"
 date: 2012-02-19 15:58
 comments: true
-categories: [study, notes, ruby]
-tags: [study, ruby]
+categories: [study, notes, programming, language]
+tags: [study, ruby, programming, language]
 ---
 
 看得再多也不如自己动手试，最近有闲就打算认真研究一下ruby语言了。[Pragmatic programmer](http://pragprog.com/the-pragmatic-programmer)中说，需要一年学一门新语言一遍改造思想，去年浅浅的学了javascript的皮毛，今年可以看看ruby这个有lisp之风的OO语言了。

@@ -3,8 +3,8 @@ layout: post
 title: Kotlin语言之变量约束设计
 date: 2017-06-05 23:12
 comments: true
-categories: [kotlin, programming]
-tags: [kotlin, programming, fp]
+categories: [language, programming, design]
+tags: [kotlin, programming, language,fp]
 ---
 可变状态的泛滥往往被认为是软件维护灾难的元凶之一，尤其是当过程封装遇上多线程，普通的面向对象编程技巧完全不堪大用，因为**继承/封装/多态等手法针对的都是程序组织上**的处理措施，具体到底层实现上，传统的C/C++/JAVA依然依赖**过程式实现跟操作系统打交道**。
 
