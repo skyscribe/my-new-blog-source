@@ -8,8 +8,8 @@ categories: [ engineering, notes]
 
 本文是第三部分。
 
-- [第一部分]({{ root_url }} /blog/2013/08/11/agile-software-development-the-cooperative-game-reading-1/index.html)。
-- [第二部分]({{ root_url }} /blog/2013/08/14/agile-software-development-the-cooperative-game-reading-2/index.html)。
+- [第一部分]({{ root_url }} /post/2013/08/11/agile-software-development-the-cooperative-game-reading-1/index.html)。
+- [第二部分]({{ root_url }} /post/2013/08/14/agile-software-development-the-cooperative-game-reading-2/index.html)。
 
 <!--more-->
 

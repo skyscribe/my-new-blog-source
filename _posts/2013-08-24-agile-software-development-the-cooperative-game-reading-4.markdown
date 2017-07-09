@@ -8,9 +8,9 @@ categories: [ engineering, notes]
 
 本文是第四部分，主要讨论方法论和方法设计的一些基本规则，已经如何清晰地**定制和应用**这些规则。
 
-- [第一部分]({{ root_url }} /blog/2013/08/11/agile-software-development-the-cooperative-game-reading-1/index.html)。
-- [第二部分]({{ root_url }} /blog/2013/08/14/agile-software-development-the-cooperative-game-reading-2/index.html)。
-- [第三部分]({{ root_url }} /blog/2013/08/18/agile-software-development-the-cooperative-game-reading-3/index.html)。
+- [第一部分]({{ root_url }} /post/2013/08/11/agile-software-development-the-cooperative-game-reading-1/index.html)。
+- [第二部分]({{ root_url }} /post/2013/08/14/agile-software-development-the-cooperative-game-reading-2/index.html)。
+- [第三部分]({{ root_url }} /post/2013/08/18/agile-software-development-the-cooperative-game-reading-3/index.html)。
 
 <!--more-->
 

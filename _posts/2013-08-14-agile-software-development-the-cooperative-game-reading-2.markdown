@@ -6,7 +6,7 @@ comments: true
 categories: [ engineering, notes]
 ---
 
-本文是第二部分([第一部分]({{ root_url }} /blog/2013/08/11/agile-software-development-the-cooperative-game-reading-1/index.html))。
+本文是第二部分([第一部分]({{ root_url }} /post/2013/08/11/agile-software-development-the-cooperative-game-reading-1/index.html))。
 
 <!--more-->
 
