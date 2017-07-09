@@ -6,10 +6,16 @@
   {% assign words = page.content | strip_html | strip_newlines | size %}
 {% endif %}
 
-{% if words < words_per_minute %}
-  {{ site.data.ui-text[site.locale].less_than | default: "less than" }} 1 {{ site.data.ui-text[site.locale].minute_read | default: "minute read" }}
-{% elsif words == words_per_minute %}
-  1 {{ site.data.ui-text[site.locale].minute_read | default: "minute read" }}
-{% else %}
-  {{ words | divided_by:words_per_minute }} {{ site.data.ui-text[site.locale].minute_read | default: "minute read" }}
-{% endif %}
+{% comment %} TODO: move those to ui_data text? {% endcomment %}
+本文有 {{words}} 字，大约需要 {{words || divided_by:words_per_minute }} 分钟可以读完
+
+{% comment %}
+    {% if words < words_per_minute %}
+      {{ site.data.ui-text[site.locale].less_than | default: "less than" }} 1 {{ site.data.ui-text[site.locale].minute_read | default: "minute read" }}
+    {% elsif words == words_per_minute %}
+      1 {{ site.data.ui-text[site.locale].minute_read | default: "minute read" }}
+    {% else %}
+      {{ words | divided_by:words_per_minute }} {{ site.data.ui-text[site.locale].minute_read | default: "minute read" }}
+    {% endif %}
+{% endcomment %}
+

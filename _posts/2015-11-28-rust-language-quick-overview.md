@@ -512,10 +512,139 @@ struct Button<T: ClickCallback> {
 由于结构体的大小必须在编译期确定，因而直接放一个大小不确定的`ClickCallback`就不能编译通过了；标准库中提供了智能指针来帮我们很优雅地解决了这个问题；因为指针的大小总是确定的。具体到实现上，其**原理和C++中的虚函数表**非常类似，一个封装了`Traits`的智能指针（这里是`Box`）内部结构上类似于一个`vtable`，其指向一个在运行期动态构造的函数表。在调用的地方，编译器可以自动查找具体实现了对应`Traits`的结构的函数表，转到正确的调用地址。
 
 ### 函数式编程
+函数式编程风格具有更高的抽象层次和更丰富的表达能力，更有利于写出**声明式风格**的代码。较新的编程语言无一例外都或多或少对函数式编程风格提供支持。
+Rust的函数式编程具有明显的**Haskell痕迹**。
+
+#### 枚举类型`Enum`
+
+Rust的枚举类型和传统的C++/Java中的枚举的概念类似，都可以用来表示取值有固定可能性的数据类型；
+通过与泛型的结合，`Enum`还拥有和Haskell的抽象数据类型ADT相同的扩展能力。
+
+最简单的枚举类型定义可以是如下的样子
+```rust
+enum IpAddrKind {
+    V4,
+    V6
+}
+```
+这里每个具体的枚举值都是一个不同的具体值，同时他们的类型是一样的。更复杂一点的情况是，`Enum`支持**每个枚举的值可以有不同的类型构造**，如
+```rust
+enum IpAddr {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
+
+let home = IpAddr::V4(127, 0, 0, 1)
+let lo = IpAddr::V6(String::from("::1"))
+```
+更一般地，具体的枚举值可以用不同的类型来构造出来;从而我们由此将**不同类型的数据聚合在一起形成一个抽象的定义**。
+```rust
+struct IpAddr4 {
+    // 细节省略
+}
+
+struct IpAddr6 {
+    // 细节省略
+}
+
+enum IpAddr {
+    V4(IpAddr4),
+    V6(IpAddr6)
+}
+```
+
+#### 模式匹配
+一个`Enum`中可能封装了不同的数据，当需要对不同的可能的数据做不同的处理的时候，Rust采用模式匹配的方式来提高代码的可读性。
+模式匹配是一种**特殊的表达式**，采用`match`关键字和一个包含**枚举了所有可能的取值以及其处理代码**的代码块组成。譬如考虑上面的地址定义，如果需要对不同的地址类型有不同的处理，可以用模式匹配的方式写为
+```rust
+fn handle_address(addr : IpAddr) -> i32 {
+    match addr {
+        IpAddr::V4 => 1,
+        IpAddr::V6 => 2,
+    }
+}
+```
+这里每一个`=>`对用`,`分隔开，其左边的部分是某个具体的枚举变量值，右边是对应的处理表达式。当表达式不止一条语句的时候，可以用大括号隔开。
+
+模式匹配必须保证**所有的枚举值**都必须被处理过；并且处理表达式的类型必须是一样的；否则编译器会报错。
+当枚举的可能取值有很多个而处理代码只对其中部分可能值感兴趣，可以用`_`来表示可以匹配所有之前未匹配到的值。
+
+另外一种特殊的情况是，我们仅仅关心某个枚举值中的一个的时候，`match`语法依然显得比较啰嗦；Rust提供了特殊的语法来简化代码，如
+```rust
+let some_u8_value = Some(0u8);
+match some_u8_value {
+    Some(3) => println!("three!")
+    _ => (),
+}
+```
+可以改写为
+```rust
+if let Some(3) = some_u8_value {
+    println!("three!")
+}
+```
+
+类似的我们也可以像常规的处理一样加上一个`else`分支来处理其它不匹配的情况。
 
 #### Option类型
+Option是一个封装类型，其概念和Haskell中的Monad或Java8中的`Optional`的作用比较类似；都是用于表示一种要么存在一个值要没没有值的容器。
+它比空指针有优势的地方在于它是一种应用逻辑层的抽象；是用于替代空指针的一个很好的工具。
+> I call it my billion-dollar mistake. At that time, I was designing the first comprehensive type system for references in an object-oriented language. My goal was to ensure that all use of references should be absolutely safe, with checking performed automatically by the compiler. But I couldn't resist the temptation to put in a null reference, simply because it was so easy to implement. This has led to innumerable errors, vulnerabilities, and system crashes, which have probably caused a billion dollars of pain and damage in the last forty years.
+>
+> - Tony Honare, the inventor of `null`
+
+Rust中的Option是一种**构建于泛型技术上的特殊的enum**类型
+```rust
+pub enum Option<T> {
+    None,
+    Some(T),
+}
+```
+[标准库](https://doc.rust-lang.org/std/option/enum.Option.html)提供了一些成员函数来实现常见的绑定/链式操作范式
+- `fn is_some(&self) -> bool` 判断是否有值
+- `fn is_none(&self) -> bool` 判断是否为空
+- `fn unwrap(self, msg: &str) -> T` 用于提取内部存储的值，如果不存在则用给定的消息`panic`
+- `fn unwrap(self) -> T` 移动内部存储的值如果其存在的话；不存在则`panic`
+- `fn unwrap_or(self, def: T) -> T` 存在的话返回其存储的值，否则返回提供的默认值
+- `fn unwrap_or_else<F>(self, f: F) -> T where F: FnOnce() -> T` 尝试提取值，如果不存在调用给定的函数生层一个值
+- `fn map<U, F>(self, f: F) -> Option<U> where F: FnOnce(T) -> U` 经典的`map`操作，将值通过给定的函数转换成另外一个值并封装成新的`Option`，如果不存在，则也重新封装成目标类型的空值 
+- `fn map_or<U, F>(self, default: U, f:F) -> U where F: FnOnce(T) -> U` 类似于map操作，但返回转换后的类型；如果空则返回给定的默认值
+- `fn as_ref(&self) -> Option<&T>` 返回引用类型
+- `fn as_mut(&mut self) -> Option<&mut T>`返回可修改的类型
+- `fn iter(&self) -> Iter<T>` 返回迭代器类型，可以遍历其值，这里的迭代器总是只能返回一个值
+- `fn and<U>(self, optB: Option<U>) -> Option<U>` 如果没有值，则返回空，否则返回给定的新的`optB`，便于链式操作减少逻辑判断
+- ...
+
+
 
 #### 闭包Closure
+
+闭包是另外一个重要的函数式编程工具；Rust采用的语法是比较类似于Ruby，其内部实现上则采用C++的**匿名函数模型**；即闭包对象其实生成的是匿名的函数对象。
+一个最简单的例子
+
+```Rust
+let calculate = |a, b| {
+    let mut result = a * 2;
+    result += b;
+    result
+};
+
+
+assert_eq!(7, calculate(2, 3)); // 2 * 2 + 3 == 7
+assert_eq!(13, calculate(4, 5)); // 4 * 2 + 5 == 13
+```
+
+闭包的**类型注解约束要比函数定义的要求宽松**一些，即不需要指定返回类型也可以;和现代C++的[`generic lambda`特性](https://isocpp.org/wiki/faq/cpp14-language#generic-lambdas)比较类似；
+都是为了方便程序员写出更简洁、干净的代码。如下的代码是完全等价的
+
+```rust
+fn  add_one_v1   (x: i32) -> i32 { x + 1 }  // a function
+let add_one_v2 = |x: i32| -> i32 { x + 1 }; // the full syntax for a closure
+let add_one_v3 = |x|             { x + 1 }; // a closure eliding types
+let add_one_v4 = |x|               x + 1  ; // without braces
+```
+从代码可读性和可维护性的角度来看，最好**不用闭包来写太长/太复杂的代码块**，
+因为随着匿名代码块中逻辑的增加，上下文逻辑变得更加模糊；这个时候，用一个命名良好的子函数反而更清晰便于维护。
 
 ## 软件工程支持 - 工具和方法
 
@@ -553,3 +682,15 @@ Rust希望程序员明确的区分这两种测试，并采用不同的约定
 `cargo test`命令可用来执行所有的测试，并且**默认是并发执行**的;这样开发的反馈周期会更短；也可以用命令来显示要求线性执行 - 传入 `--test-threads=1`即可。
 一些更复杂的特性，如指定某个case的执行，跳过某些特定的case，以及按照某个过滤条件来选择特定的case，忽略case运行过程中的打印输出等特性也被贴心的支持了。
 
+## 总结
+在注重极致性能又强调工程协作和扩展性的系统编程领域，Rust做了比较大胆的尝试，在不引入垃圾收集并保持强类型检查的前提下，
+它期望能将**C++的零成本抽象推向一个新的高度**而又能避免陷入传统C/C++语言指针访问安全性以及复杂的模板元编程等复杂性的泥潭。
+
+它的泛型编程支持和强调值对象唯一所有权的概念和对象生存周期的强制检查使得多线程并发编程变得轻松简单；
+加上强类型检查的约束，编译通过的程序往往运行期错误也变得很少，这一来**自于Haskell的设计哲学**深深地影响着Rust。
+
+从一开始就加入的包管理器机制和对丰富的软件工程工具支持以及对开源社区的热情拥抱，使得Rust一开始就汲取了传统C/C++语言工程化支持不足的一些教训。
+中心化的软件仓库以及对流行IDE、编辑器环境的支持使得它可以更好地赢得社区的支持。
+
+于此同时随着更新节奏的加快，基于ISO标准化的C++语言也在通过更快的迭代速度和更短的更新周期对这些新加入的竞争者予以反击；
+期望Rust能在系统编程领域掀起新的波澜。
