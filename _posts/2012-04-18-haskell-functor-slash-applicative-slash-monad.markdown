@@ -22,7 +22,7 @@ Functor定义为一个Typecalss，其定义了一个fmap函数，对于对应的
 
 GHC自带的很多基本**ADT**满足Functor的要求，即他们自身是Functor的实例，包括Maybe, list([]), IO Monad, Either等。
 
-``` haskell
+```haskell
 fmap :: Functor f => (a->b) -> f a -> f b
 fmap (+1) (Just 1) 
 -- Just 2, type = Maybe, constructor = Just
@@ -59,7 +59,7 @@ ghci>fmap (\f -> f 2) a
 因为传入fmap的函数参数为: `(^) :: (Num a, Integral b) => a -> b -> a`, 数据类型为 `list`, 于是，fmap的结果则是一个list类型，其中的元素参数为一个函数。对于这个list再次调用**fmap**, 那么对应的函数就是一个基于函数的函数 (**lambda**描述为 `\f -> f 2`), 结果就是将对应的lambda 函数作用于list中的每一个函数，生成最终的list 数据。这里的2次fmap调用得到的结果始终是一个list, 只不过每次的list具体数据类型有所不同。
 
 如果想将`fmap`作用于一个不同类型的ADT数据 (Context)，那么编译器机会报错：
-``` haskell
+```haskell
 ghci>fmap Just (^2) Just 5
 
 <interactive>:1:6:
@@ -115,7 +115,7 @@ pure (+) <*> Just 3 <*> Just 5
 ### `<*` 和 `*>` 及 const
 
 `<*`和`*>`的类型表明它忽略函数的右侧或者左侧参数数值，但是对应的容器类型(f)没有发生变化。比如如下的例子：
-``` haskell
+```haskell
 ghci>:info <*
 class Functor f => Applicative f where
   ...
@@ -136,13 +136,13 @@ Just 3
 ```
 
 可见`<*` 是忽略函数右侧的其它参数，返回左侧。`*>`则和其相反：
-``` haskell
+```haskell
 ghci>Just (+2) *> Just 1
 Just 1
 ```
 
 Haskell有如下的`const`函数，因此 `<*` `*>`可以有 `<*>` 和`const`来实现:
-``` haskell
+```haskell
 ghci>:info const 
 const :: a -> b -> a    -- Defined in GHC.Base
 f *> g = flip const <$> f <*> g
@@ -161,12 +161,12 @@ ghci>[length] <*> ["ss", "tt", "bar"]
 ```
 这里的容器类型（构造函数）是`[]`本身，所以其中的映射函数 `a->b` 必须放置在 `[]`中，对应的**applicative**参数分别是`Int`和`[Char]`。考虑如下更复杂一点的情形： 
 
-``` haskell
+```haskell
 ghci>[(^2), sqrt]  <*> [1..4]
 [1.0,4.0,9.0,16.0,1.0,1.4142135623730951,1.7320508075688772,2.0]
 ```
 这里的`<*>`操作结果为对于左边的每一个函数，依次作用于右边的每一个元素，并且返回结果的list。自然左边参数的函数类型必须是相同的;根据以上行为可见，list 的 Applicative定义其实为：
-``` haskell
+```haskell
 instance Applicative [] where
     pure x = [x]
     gs <*> xs = [g x | g <- gs, x <- xs]
@@ -174,7 +174,7 @@ instance Applicative [] where
 其`<*>`函数是通过**list comprehension**来完成的。
 
 另外一种实现是分别取左右（相对于操作符 `<*>` 函数的中缀表达式写法）的对应函数和参数，将所得的运算结果放置于结果list中；即ZipWith:
-``` haskell
+```haskell
 newtype ZipList a = ZipList {getZipList :: [a])
 
 instance Applicative ZipList where
@@ -184,7 +184,7 @@ instance Applicative ZipList where
 
 下边是一个ZipList的例子：
 
-``` haskell
+```haskell
 ghci>getZipList $ ZipList [(^2), sqrt, (+10), (/2)] <*> ZipList [2..10] 
 [4.0,1.7320508075688772,14.0,2.5]
 ```
@@ -193,7 +193,7 @@ ghci>getZipList $ ZipList [(^2), sqrt, (+10), (/2)] <*> ZipList [2..10]
 ### <$> 操作符
 
 为了简化代码并且提高可读性，Applicative定义了`<$>`操作符，类似于基本的`($)`函数，且有：
-``` haskell
+```haskell
 f <$> a = fmap f a
 pure f <*> x = fmap f x = f <$> x
 
@@ -215,7 +215,7 @@ Just 40
 ### Applicative 定律
 
 Applicate的实例类型必须满足如下定律：
-``` haskell
+```haskell
 pure id <*> v = v                               --Identity
 pure (.) <*> u <*> v <*> w = u <*> (v <*> w)    --Composition
 pure f <*> pure x = pure (f x)                  --Homomorphism
@@ -239,7 +239,7 @@ ci>Just (*2) <*> (Just (+3) <*> Just 2)
 Just 10
 ```
 - Homomorphism
-``` haskell
+```haskell
 ci>Just (*2) <*> Just 2
 Just 4
 ghci>Just ((*2) 2)
@@ -257,7 +257,7 @@ Just 4
 ### IO Monad and Applicative
 
 所有的Monad都满足Applicative的要求；其实Monad对结构化的要求比Applicative的要高。对于IO Monad，以下是其实现：
-``` haskell
+```haskell
 instance Applicative IO where
     pure = return
     a <*> b = do
@@ -267,14 +267,14 @@ instance Applicative IO where
 ```
 
 对于如下的do风格程序：
-``` haskell
+```haskell
 greeting = do
     firstName <- getLine
     LastName <- getLine
     putStrLn $ "hello" ++ firstName ++ lastName
 ```
 可以用Applicative风格更优雅地写作：
-``` haskell
+```haskell
 greeting = do
     name <- (++) ($) getLine <*> getLine
     putStrLn $ "hello" ++ name
@@ -285,7 +285,7 @@ greeting = do
 ### Applicative 辅助函数
 
 Aplicative定义了如下一些辅助函数用于简化代码书写：
-``` haskell
+```haskell
 liftA :: Applicative f => (a->b) -> f a -> f b
 liftA f a = pure f <*> a = f <$> a
 
@@ -299,7 +299,7 @@ liftA3 f a b c = f <$> a <*> b <*> c
 ## Functor/Applicative Functor/Monad
 
 在Monad中，Haskell定义了`ap`函数, 如果参照`<*>`的定义：
-``` haskell
+```haskell
 ghci>:info ap
 ap :: Monad m => m (a -> b) -> m a -> m b
     -- Defined in Control.Monad

@@ -119,7 +119,7 @@ before calling #<Proc:0x8ad0310@closure_return.rb:35 (lambda)>...
 called #<Proc:0x8ad0310@closure_return.rb:35 (lambda)> result:value from proc
 before calling #<Method: Object#test_method>...
 called #<Method: Object#test_method> result:test method
-``` 
+```
 
         
     - lambda/method表现出真正的closure行为，仅仅返回closure本身；外部调用控制流不受影响，继续yield或者call的下一语句执行

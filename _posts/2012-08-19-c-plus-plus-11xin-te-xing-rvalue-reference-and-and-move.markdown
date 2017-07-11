@@ -42,7 +42,7 @@ C++11引入的Rvalue Reference主要是为了解决两个问题：
 ### Rvalue定义
 
 C++03中，不允许定义引用的引用，即`X&& b = x`;而C++11正好借用这个符号来表述Rvalue reference, 即： 
-``` cpp
+```cpp
 class X;
 void func(X&& obj){
 }

@@ -32,7 +32,7 @@ newtype Pair' a b = Pair' (a,b)
 既然`newtype`有这么多的不便，那么为什么会有人将其引入进来？对于newtype类型而言，一个最大的特点是，其构造函数在编译期间就被擦掉了，即运行期间，其构造函数是不可见的，其封装的类型和内部的field类型完全没有区别(对于类型系统而言）;这样就会有巨大的**性能优势**：newtype类型的数据既照顾了数据抽象和代码可读性的要求，又具有尽可能少的额外处理负担；当然这些好处也带来一些很微妙的问题。
 
 考虑如下的例子：
-``` haskell
+```haskell
 newtype Feet = Feet Double
 newtype Cm   = Cm Double
 ```
@@ -42,7 +42,7 @@ newtype Cm   = Cm Double
 
 对函数进行pattern match的时候，由于构造函数实际上已经不可见，因而对newtype的构造函数进行的匹配实际上会被忽略，但是对于data类型而言，构造函数的参数数据则必须被严格赋值,如下边的代码：
 
-``` haskell
+```haskell
 data Foo = Foo Int
 newtype NewFoo = NewFoo Int
 

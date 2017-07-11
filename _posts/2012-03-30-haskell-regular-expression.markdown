@@ -21,19 +21,19 @@ Haskell的正则表达式库位于Text.Regex中 , Ubuntu默认的GHC中并没有
 和Perl中的正则表达式匹配操作符一样，正则库提供了`=~`操作来完成匹配。和其它语言不同的是，这个函数(`infix operator`)通过返回值多态提供灵活的功能。
 
 1. 基本匹配 - 可以指定返回类型为Bool来判断是否匹配:  
-``` haskell
+```haskell
 let pat = "(foo[a-z]*bar|quxx)"
 "A match with foodiabar after" =~ pat :: Bool  --True
 "no match" =~ pat :: Bool -- False
 ```
 2. 返回第一个匹配的子串或者空串：  
-``` haskell
+```haskell
 let pat = "(foo[a-z]*bar|quxx)"
 "A match with foodiabar after" =~ pat :: String  --get "foodiabar"
 "no match" =~ pat :: String -- get empty string
 ```
 3. 返回匹配的上下文信息：   
-``` haskell
+```haskell
 let pat = "(foo[a-z]*bar|quxx)"
 "A match with foodiabar after" =~ pat :: (String, String, String)
 -- get ("A match with ", "foodiabar", " after")
@@ -42,7 +42,7 @@ let pat = "(foo[a-z]*bar|quxx)"
 ```
 这里可以区分出是否有空串匹配。  
 4. 返回更多信息：  
-``` haskell
+```haskell
 let pat = "(foo[a-z]*bar|quxx)"
 "A match with foodiabar quxx after" =~ pat :: (String, String, String, [String])
 -- get ("A match with ", "foodiabar", " quxx  after", ["foodiabar"])
@@ -51,7 +51,7 @@ let pat = "(foo[a-z]*bar|quxx)"
 ```
 这里最后的一个String list可以用于返回子分组信息。  
 5. 获取匹配字符的index信息和长度：  
-``` haskell
+```haskell
 let pat = "(foo[a-z]*bar|quxx)"
 "A match with foodiabar after" =~ pat :: (Int, Int)
 -- get (13, 9)

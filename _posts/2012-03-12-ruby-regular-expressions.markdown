@@ -14,12 +14,12 @@ tags: [ruby, programming, language, notes]
 Ruby中的正则表达式有 2 种方式：
 
 * 用'/'分隔的字符串('/' 本身需 '\/' 转义）  
-``` ruby
+```ruby
 /myPattern/mi
 "Ruby matches uby" =~ /aTch/im #result is 6
 ```
 * 用 %r 开头，然后以其后第一个字符为分隔符的串  
-``` ruby
+```ruby
 %r!/usr/local/!
 "/usr/local/bin/" =~ %r!/usr/local/! # => 6
 ```
@@ -52,7 +52,7 @@ Ruby中的正则表达式有 2 种方式：
 
 - 替换函数： sub/gsub 前者仅仅匹配第一个，后者找到所有匹配  
 
-``` ruby
+```ruby
 1.9.2p290 :016 >   text = "Some string for test only, more..."
 => "Some string for test only, more..." 
 1.9.2p290 :017 > text.sub('or', '|')
@@ -65,7 +65,7 @@ Ruby中的正则表达式有 2 种方式：
 ## Regexp 对象 
 
 基本的正则表达式语法实际上对应着一个regexp对象，Regexp类定义了`match`函数，其返回一个MatchData 对象，即：
-``` ruby
+```ruby
 obj = /testRege[xX]p/i
 obj.class #Regexp
 mat = obj.match('testRegexp')
@@ -75,7 +75,7 @@ mat.regexp #/testRege[xX]p/i
 
 MatchData 对象中的`length`可以用于查询group的数量，而`[]`则可以返回匹配部分的每一个`()`分隔的group, 其中`[0]`返回整个匹配的字符串，而[1]...[N]返回第N个子group. 例如：
 
-``` ruby
+```ruby
 pattern = /^(\w+)\s*=\s*(\w+)\s*(#*.*)$/
 testStr1 = "key = value1"
 testStr2 = "key = value2 #a comment"
@@ -88,7 +88,7 @@ mat2 = pattern.match(testStr2)
 
 `offset`函数用于查询第N个子group的开始/结束 offset，参数为0时返回整个匹配的offset：
 
-``` ruby
+```ruby
 mat1.offset 0 # [0,12]
 mat1.offset mat1.length - 1 #[12,12]
 mat2.offset mat2.length - 1 #[13,23]

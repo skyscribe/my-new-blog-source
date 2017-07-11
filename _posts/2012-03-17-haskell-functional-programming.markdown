@@ -24,7 +24,7 @@ List 是 haskell 内建类型里边的最基本类型之一，也是函数式变
 
 任何函数在Haskell中本质上仅仅绑定一个参数，如果在声明了可以绑定多个参数的函数后边提供少于期望个数的参数后，便可以得到一个新的函数，新函数的参数个数等于原函数的参数数减去已经提供的参数个数。如果提供的参数个数和期望的参数个数相同，则对应的就是一个新的函数调用；否则，我们得到了一个 partial function, 其中未指定的参数可以在随后调用中指定。例如：
 
-``` haskell
+```haskell
 Prelude> :type foldl
 foldl :: (a -> b -> a) -> a -> [b] -> a
 Prelude> :type foldl (+)
@@ -42,7 +42,7 @@ Haskell中的循环其实是通过递归(recursion)来完成的，配合pattern 
 
 对于一些很常见的从一个链表中计算一个结果的操作，haskell提供了一些fold函数来简化代码，不再需要通过手工编写的 recursion/pattern matching来完成。如下的代码完成给定字符串转换为对应的**Int**数（仅仅处理正整数）：
 
-``` haskell
+```haskell
 type ErrorMessage = String
 asInt_either :: String -> Either ErrorMessage Int
 asInt_either "" = Left "None string can't be converted!"
@@ -76,7 +76,7 @@ isDigit c | ord c < ord '0' = False
 
 lambda 在 haskell 中用的并不是太多，因为其会造成程序可读性下降，而Haskell中可以通过 `let .. in` 或者 `where`的方式很轻松的定义局部函数。此外局部函数可以用一个描述其目的的名字来更好的帮助理解调用点的逻辑。例如：
 
-``` haskell
+```haskell
 func :: [Integer] -> [Integer]
 func = map (\a -> (a^(a-1) + a)) 
 
@@ -86,7 +86,7 @@ func = map calc where calc a = a ^ (a-1) + a
 
 函数可以相互组合，默认的方式是从左到右从而生成高阶函数，`.`可以用于组合函数使得先调用右侧函数，再作用于左侧。即:
 
-``` haskell
+```haskell
 func1 func2 func3 param = ((func1 func2) func3) param
 func1 . func2 . func3 param = func1 ( func2 ( func3 param) )
 ```
@@ -95,7 +95,7 @@ func1 . func2 . func3 param = func1 ( func2 ( func3 param) )
 
 Section 用于简化函数的组合，使得函数调用可以用中缀表达式的方法来书写，以增强代码可读性。譬如：
 
-``` haskell
+```haskell
 (1+) 2j
 map (*3) [23,36]
 (`elem` ['a'..'z'] 'f'
@@ -103,7 +103,7 @@ isAny needle haystack = any (need `isInfixOf`) haystack
 ```
 
 As-pattern 用于提高代码可读性，并减少新list的copy开销，`@`之后的部分将绑定到之前的一个变量之上，之后可以直接引用此变量而不需要创建新的List,例如：
-``` haskell
+```haskell
 suffixes :: [a] -> [[a]]
 suffixes xs@(_:xs') = xs : suffixes xs'
 suffixes _ = []
@@ -112,7 +112,7 @@ suffixes _ = []
 `seq`可以用于解决lazy-evaluation导致某些部分由于没有被调用而没有赋值的情况。`seq`的应用需要注意：
 
 1. `seq`表达式必须表达式中第一个被赋值的，例如：   
-``` haskell
+```haskell
 forceEv x y = x `seq` someFunc y
 chained x y z = x `seq` y `seq` someFunction z
 ```

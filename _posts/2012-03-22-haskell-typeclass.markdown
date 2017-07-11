@@ -14,7 +14,7 @@ Haskell 中也有class关键字，但其目的却和 OO 中的类有着巨大的
 
 由于 Haskell 是一个纯函数式语言，所有的操作都是用函数方式实现的（递归和模式匹配）；同时作为一个强类型语言，所以函数的参数必须绑定于特定的类型，而不同的数据类型之间是不能直接转换的 ( 需要转的也必须通过某些函数来实现 ), 那么对于同样一个类似的函数，可能就需要对不同的类型有不同的实现，因为操作的类型可能不同，这样就会带来很繁琐的代码，例如：
 
-``` haskell
+```haskell
 someOpOnInt::Int -> Int
 someOpOnDouble::Double->Int
 someOpOnFractional::Fractional-> Int
@@ -24,13 +24,13 @@ someOpOnFractional::Fractional-> Int
 
 Typeclass则可以很好的解决这个问题：
 - 一个 typeclass 来定义所支持的操作，例如  
-``` haskell
+```haskell
 class SomeOp a where
     someOp :: a -> Int
 ```
 
 - 每一个可以支持该操作的类型可以实现对应的操作，如：  
-``` haskell
+```haskell
 instance SomeOp Int where
     -- implementition for Int type
     someOp x = undefined
@@ -45,7 +45,7 @@ instance SomeOp Fractional where
 ```
 
 - typeclass是开放的，这意味着你可以在不同的模块里边实现其它模块中定义的 typeclass   
-``` haskell
+```haskell
 data BrandNewType = BrandNewType String Int
         deriving (Show, Eq)
 
@@ -60,7 +60,7 @@ instance SomeOp BrandNewType where
 
 这是两个系统预定义的 typeclass, Show 用于将某个类型转换为 string， 而 Read 则用于从一个字符串表述中构造一个指定类型的数据。二者结合可以完成数据的序列化和反序列化。系统提供的 putStrLn 操作于某个数据类型的时候，如果其类型继承了 Show，那么它的字符串表示就会被打印出来。当然`show` 函数也可以用于打印其字符串表述，而 Read 则用构造出一个指定类型的对象，比如：
 
-``` haskell
+```haskell
 data Color = Read | Green | Blue
 instance Show Color where
     show Red = "Red"
@@ -122,7 +122,7 @@ data ThisWorks = ThisWorks OK
 
 由于 typeclass 是开放的， 不同的模块可能对不同的类型提供不同的 typeclass instance实现，二者就可能出现冲突，例如：
 
-``` haskell
+```haskell
 class Borked a where 
     bork:: a -> String
 

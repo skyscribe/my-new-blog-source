@@ -50,17 +50,17 @@ STL模板类型的引入使得C++的类型系统变得异常复杂，尤其在�
 ## Trailing return type
 -----------------------
 这个特性用于简化模板代码的书写，譬如如下的代码在C++03中是非法的：
-``` c++
+```c++
 template<class Lhs, class Rhs>
   Ret adding_func(const Lhs &lhs, const Rhs &rhs) {return lhs + rhs;} //Ret must be the type of lhs+rhs
 ```
 为了模板函数的灵活性，`Ret`类型必须被指定为一个合理的动态类型-即根据实际传入的LHS/RHS来确定，当然人工指定的办法很不灵活，我们自然希望编译器能够自动推倒，一种自然的想法是尝试用`auto`:
-``` cpp
+```cpp
 template<class Lhs, class Rhs>
   decltype(lhs+rhs) adding_func(const Lhs &lhs, const Rhs &rhs) {return lhs + rhs;} //Not legal C++11
 ```
 可惜这仍然是非法的，因为decltype需要编译扫描的时候必须知道对应参数的类型，而这些信息只有在模板函数实例化的时候才有。为了解决这一个问题，C++11引入了*Trailing return type*:
-``` cpp
+```cpp
 template<class Lhs, class Rhs>
   auto adding_func(const Lhs &lhs, const Rhs &rhs) -> decltype(lhs+rhs) {return lhs + rhs;}
 ```
@@ -121,7 +121,7 @@ enum class Enumeration : unsigned int{
 ## 右扩号的问题修正
 ---------------------
 这是一个bug fix，使得这样的代码变得合法：
-``` cpp
+```cpp
 std::vector<std::pair<int, int>> vec;
 ```
 
@@ -140,7 +140,7 @@ using TypedefName = SomeType<OtherType, Second, 5>;
 ## Union类型可以放置non-POD
 ------------------------------
 C++03中，Union中不可放置POD类型意外的东西，而C++11中，我们可以放置任何类型到Union中了：
-``` cpp
+```cpp
 //for placement new
 #include <new>
  

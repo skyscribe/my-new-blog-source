@@ -24,7 +24,7 @@ Python自带的unittest和test两个模块为编写test case提供了很灵活�
 
 最后的代码就有了：
 
-``` python
+```python
 import unittest
 from test import test_support
 

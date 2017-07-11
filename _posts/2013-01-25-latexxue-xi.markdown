@@ -29,7 +29,7 @@ Pandoc是一个用**Haskell**写就的库，在Windows上安装，则直接到[�
 
 windwos平台的安装还需安装Tex工具，都是Exe格式的安装包。装完之后，根据其文档，如下的命令就可以简单的生成PDF文档了（还是写个Makefile方便一些吧）:  
 
-``` make
+```make
 target: test.markdown test.pdf test.html
     echo "done"
 
@@ -55,7 +55,7 @@ latex初探
 ---------------------------
 最简单的文件非**hello world**莫属了，但是需要生成hello world也还是需要不少基本的工作的；当然比起word里边敲敲字符要费劲一些，但是短期的痛苦只是为了长久的便利。完成这个最简单的任务大概是需要这些：
 
-``` tex
+```tex
 \documentclass{article}
 \begin{document}
 Hello world
@@ -67,7 +67,7 @@ Tex的语法看起来和正式的变成语言类似，所有的命令都已`\`�
 ---------------
 在`\begin`和`\end`之间的部分是对应文档的内容了。文档的内容组织可以用段落和子段落的方式来组织，默认对段落是自动标号的，譬如下边的代码：  
 
-``` tex
+```tex
 %preambles
 \documentclass{article}
 \usepackage{times}
@@ -147,7 +147,7 @@ Some introduction text
 1. 定义  
    在文档结束之后，可以通过`\begin{thebibliography}{9}`的格式来定义参考文献列表，其后用`\end{thebibliography}'结束，譬如如下例子：   
 
-``` tex
+```tex
 \begin{thebibliography}{9}
     \bibitem{autha91}
     some auther, 

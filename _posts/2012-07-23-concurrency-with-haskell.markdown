@@ -24,7 +24,7 @@ Haskell提供了两种Concurrency模式，一个是传统的Thread/condition/sem
 
 Haskell的Thread方式和传统的变成语言或者库有显著的不同；其定义在`Control.Concurrent`中提供。由于Thread本身是有副作用的，hanskell通过封装**IO Monad**的方式来提供Thread,即一个thread为一个**IO action**,要使用thread则可以调用`forkIO`来执行一些任务。
 
-``` haskell
+```haskell
 ghc>:m +Control.Concurrent
 ghc>:info forkIO
 forkIO :: IO () -> IO ThreadId -- Defined in `GHC.Conc.Sync'
@@ -42,7 +42,7 @@ True
 
 需要注意的是，由于新线程的执行顺序是不确定的，因此上述例子中的程序返回结果可能不同。因为haskell中的变量全部是不可变的，因此在forkIO中传递变量是安全的，这个可以作为传递参数的一种很方便的形式，譬如下边的例子：
 
-``` haskell
+```haskell
 import Control.Concurrent(forkIO)
 import Control.Monad(forever)
 
@@ -62,7 +62,7 @@ type Connection = (Handle, SockAddr)
 
 GHC中定义了MVar来方便不同线程之间的通信，并定义有`putMVar`和`takeMVar`, 同样它们都是**IO action**:
 
-``` haskell
+```haskell
 ghc>:info MVar 
 data MVar a = GHC.MVar.MVar (GHC.Prim.MVar# GHC.Prim.RealWorld a)
 -- Defined in `GHC.MVar'
@@ -88,7 +88,7 @@ newMVar :: a -> IO (MVar a) -MVar- Defined in `GHC.MVar'
 
 下边是一个更复杂的例子，用于webserver统计所有的子连接个数 - 控制线程可以做更多有意义的控制，比如在负载满的时候停止创建新的线程等：
 
-``` haskell
+```haskell
 cceptConnections :: Config -> Socket -> IO ()
 acceptConnections config socket
 = do {  count <- newEmptyMVar ;
@@ -108,7 +108,7 @@ dec count = do { v <- takeMVar count; putMVar count (v-1) }
 
 对于简单的线程通信和交互,MVar就可以满足大部分需求；对于复杂的通信，Haskell还提供了**Channel**支持：
 
-``` haskell
+```haskell
 c>:info Chan 
 data Chan a
 = Control.Concurrent.Chan.Chan (MVar
@@ -157,7 +157,7 @@ instance Eq (TVar a) -- Definedned in `GHC.Conc.Sync'
 
 对应的TVar操作：
 
-``` haskell
+```haskell
 ghc>:t newTVar
 newTVar :: a -> STM (TVar a)
 ghc>:t readTVar
@@ -172,7 +172,7 @@ writeTVar :: TVar a -> a -> STM ()
 
 下边这个例子来自于[wikipedia](http://en.wikipedia.org/wiki/Concurrent_Haskell):
 
-``` haskell
+```haskell
 type Account = TVar Integer
 
 transfer :: Integer -> Account -> Account -> STM ()
@@ -210,7 +210,7 @@ atomically :: STM a -> IO a
 
 下边是一个调用上述实现的例子：
 
-``` haskell
+```haskell
 module Main where
  
 import Control.Concurrent (forkIO)

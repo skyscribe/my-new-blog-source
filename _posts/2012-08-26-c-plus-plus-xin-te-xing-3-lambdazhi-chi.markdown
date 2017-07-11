@@ -14,7 +14,7 @@ categories: [cpp, programming, notes]
 
 考虑下边的例子(很简单常见的例子，但很容易说明问题)：
 
-``` cpp
+```cpp
 class AddressBook;
 typedef std::vector<AddressBook> AddressList;
 void getPeopleWithAge(AddressList& result, const AddressList& list, int age){
@@ -84,7 +84,7 @@ auto f = [&]{
 f();
 ```
 甚至可以将lambda函数传入模板参数：
-``` cpp
+```cpp
 // Lambda as template parameters
 template <typename F>
 void Eval(const F& f){

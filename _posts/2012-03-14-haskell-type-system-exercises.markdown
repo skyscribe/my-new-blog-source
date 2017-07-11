@@ -14,7 +14,7 @@ Haskell的类型系统是**强类型**的，并且没有任何强制类型转换
 
 Maybe类型是有一种基于已有类型的二次封装类型，用于表述可能为空的抽象类型，用于支持类似于 C++/Java 中的模板机制，不过Haskell的类型系统表达能力比一般语言中的模板强大很多。
 
-``` haskell
+```haskell
 Maybe a = Just a | Nothing
 ```
 
@@ -30,7 +30,7 @@ Maybe a = Just a | Nothing
 
 ### toList 的实现：
 
-``` haskell
+```haskell
 data List a = Cons a (List a)
             | Nil
               deriving (Show)
@@ -60,7 +60,7 @@ Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 
 
 已经给出的实现代码：
 
-``` haskell
+```haskell
 module Tree where
 data Tree a = Node a (Tree a) (Tree a)
             | Empty
@@ -72,7 +72,7 @@ simpleTree = Node "parent" (Node "left child" Empty Empty)
 
 - 采用Maybe的实现一：
 
-``` haskell
+```haskell
 data MyTree a = MyNode a (Maybe (MyTree a)) (Maybe (MyTree a))
                 deriving (Show)
 
@@ -82,7 +82,7 @@ mySimpleTree = MyNode (Just "parent") (Just (MyNode (Just "left child") Nothing 
 
 - 采用Record语法提高可读性: 
 
-``` haskell
+```haskell
 data MyTreeRecord a = MyTreeRecord {
           parentNode  :: a
         , leftChild   :: Maybe (MyTreeRecord a)

@@ -20,7 +20,7 @@ tags: [cpp, boost]
 CMake + GIT +Spinx 确实够酷了。
 
 编译起来可以充分利用强大的CMake了：
-``` bash
+```bash
 git clone git://gitorious.org/boost/cmake.git src
 cd src
 git checkout <TAG>    //TAG==1.41.0.cmake0

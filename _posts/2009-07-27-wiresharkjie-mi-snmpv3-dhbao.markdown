@@ -15,7 +15,7 @@ Wireshark自带有配置usmUser的例子，可以自动调用netsnmp的库来完
 tshark本身可以支持很多选项，几乎涵盖了wireshark大部分常用功能，个人发现特别适合二次分析。这里最关键的是 -T pdml选项,可以生成一个完整的xml格式的分析报告。
 
 假设实现用tcpdump或者snoop抓取了一个加密的包test.pcap,那么接下来，可以用其作二次分析：
-``` bash
+```bash
 snoop -d <dev> -o test.pcap <filter>
 tshark -r test.pcap -V -T pdml > test.xml
 ```

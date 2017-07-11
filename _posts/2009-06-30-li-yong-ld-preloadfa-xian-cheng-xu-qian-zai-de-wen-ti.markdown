@@ -16,7 +16,7 @@ Solaris上有强大的mdb，辅助不同的模块可以得出很多有意思的�
 ## 启动方法
 
 可以参看其manpage，主要是几个环境变量：
-``` bash
+```bash
 export UMEM_DEBUG=default
 export UMEM_LOGGING=transaction
 LD_PRELOAD=/lib/libumem.so
@@ -24,7 +24,7 @@ export LD_PRELOAD
 ```
 
 然后在此shell中启动程序，新打开一个终端，同样设置好LD_PRELOAD（否则会提示错误），查找正运行的程序的进程号（调试的程序），生成一个core文件：
-``` bash
+```bash
 ps -ef | grep <appname>
 gcore <pid>
 ls core.<pid>
@@ -33,7 +33,7 @@ ls core.<pid>
 用mdb打开新生成的core文件，第一行应该提示加载了libumem.so.
 接下来，用libumem.so提供的walker和dcmds就可以查询程序运行以来到产生core文件的那一时间点丰富的内存信息了.
 
-``` bash
+```bash
 mdb core.pid
 >::findleaks
 >::umalog
@@ -44,7 +44,7 @@ mdb core.pid
 
 整个过程非常繁杂，因为应用程序比较大，分配内存的log实在是太多了，但是突然发现运行目录下边多了不少core文件，一下子奇怪了，之前可是花费了很多时间在提高代码质量上，按道理不应该会有core产生了。打开这些core，用pstack，居然发现某个模块启动的子进程在调用free的地方abort了，按图索骥查看代码，在某个旮旯里边，几年没人动的小角落里，发现分配内存的地方：
 
-``` c
+```c
 char* path1 = getenv("MYENV");
 char path2[] = "bin/logDir/log.xxx"
 char* path = malloc(sizeof(path1) + sizeof(path2));

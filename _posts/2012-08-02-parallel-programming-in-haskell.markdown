@@ -51,7 +51,7 @@ ghc -threaded -o NumCapabilities NumCapabilities.o
 ### 分治法的例子 - QuickSort
 
 下边是一个简单的分治法例子 - 快速排序：
-``` haskell
+```haskell
 sort :: (Ord a) => [a] -> [a]
 sort (x:xs) = lesser ++ x:greater
     where lesser  = sort [y | y <- xs, y <  x]
@@ -60,7 +60,7 @@ sort (x:xs) = lesser ++ x:greater
 ```
 
 对于这个朴素的例子，可以通过一些细微的变化使其并行起来：
-``` haskell
+```haskell
 import Control.Parallel (par, pseq)
 
 parSort :: (Ord a) => [a] -> [a]
@@ -117,7 +117,7 @@ GHC的GC还是采用单线成的方式，因而在GC工作的时候，其它线�
 
 回到上边的例子，为了将传统的顺序程序改为并行，我们必须在代码中小心的插入`pseq`/`par`/`force`来指明整个并行方式需要如何赋值运算，甚至对于`list`类型，还需通过自定义的`force`函数来强制赋值每一个元素以保证算法的正确性,这一方式看起来无疑是非常繁琐甚至重复的。再考虑`map`这一很重要的函数，对于并发控制，同样需要定义一个`paralleMap`才能放在代码里边用:
 
-``` haskell
+```haskell
 import Control.Parallel (par)
 
 parallelMap :: (a -> b) -> [a] -> [b]
@@ -130,7 +130,7 @@ parallelMap _ _      = []
 
 
 一种想法是，我们可以引入一个指定某个类型的赋值规则的**函数参数**来确定某个类型的赋值方式，譬如：
-``` haskell
+```haskell
 forceListAndElts :: ((a->())-> [a] -> ()
 forceListAndElts forceElt (x:xs) = forceElt x `seq` forceListAndElts forceElt xs
 forceListAndElts _ _ = ()
@@ -141,7 +141,7 @@ forceListAndElts _ _ = ()
 ### Strategies
 
 Haskell通过库的方式提供Strategies的支持：
-``` haskell
+```haskell
 ghc>:m +Control.Parallel.Strategies
 ghc>:info Strategy 
 type Strategy a = a -> Eval a
@@ -156,7 +156,7 @@ instance Monad Eval -- Defined in `Control.Parallel.Strategies'
 instance Functor Eval -- Defined in `Control.Parallel.Strategies'
 ```
 `Strategy`是一个`typeclass`,对每一个类型a, `Eval`构造出一个具体的Strategy，而`Eval`本身则是个`newtype`,并且是个Monad/Functor实例。此外，Strategy库还定义了如下Strategy:
-``` haskell
+```haskell
 ghc>:info rwhnf 
 rwhnf :: Strategy a -- Defined in   `Control.Parallel.Strategies'
 
@@ -201,7 +201,7 @@ parMap strat f xs = map f xs `using` parList strat
 
 上述`parMap`的实现中，左边的算法部分仍然是相同的`map f xs`实现，而`using`函数则将左侧的实际算法和右侧的`Strategy`结合起来了：
 
-``` haskell
+```haskell
 using :: a -> Strategy a -> a
 using x s = s x `pseq` x
 ```
@@ -209,7 +209,7 @@ using x s = s x `pseq` x
 ### MapReduce 的例子
 一个简化版本的MapReduce例子如下：
 
-``` haskell
+```haskell
 mapReduce
     :: Strategy b    -- evaluation strategy for mapping
     -> (a -> b)      -- map function

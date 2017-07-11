@@ -23,19 +23,19 @@ PDF输出可以用以下格式来控制：
 - 生成TOC目录表 : 使用`--toc`  
 - 控制生成的目录标题，使其自动编号。默认情况，**标题是不自动编号的**。  
 
-``` bash
+```bash
 pandoc --toc --number-sections test.markdown -o test.pdf
-``` 
+```
 - 生存beamer格式的幻灯片：  
 
-``` bash
+```bash
 #--slide-level specifies the maximum title level
 # -t beamer specifies beamer format for slide show
 pandoc --slide-level=2 -t beamer test.markdown -o test.pdf
 ```
 - 禁用pandoc的markdown扩展(采用标准markdown语法)： 
 
-``` bash
+```bash
 #-f markdown_strcit[+feature]
 pandoc -f markdown_strict test.markdown -o test.pdf
 ```

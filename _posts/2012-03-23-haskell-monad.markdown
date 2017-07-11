@@ -28,7 +28,7 @@ Monad有如下重要特征和作用：
 理解Monad需要预先熟悉一些基本特性：   
 - Type constructors   
 用于定义新的多态数据类型，该类型包含有一个动态参数类型，比如Maybe类型定义：
-``` haskell
+```haskell
 data Maybe a = Nothing | Just a
 ```
 这里的类型定义中包含一个可变参数`a`，用于表明这里定义的类型是一个类似于容器的抽象类型，包含一大类具体类型，譬如`Maybe Int`/`Maybe String`等等。其中的`constructor`可以生成两种不同的具体类型，要么是`Nothing`,要么是给定类型的一个wrapper类 `Just a`。
@@ -39,7 +39,7 @@ data Maybe a = Nothing | Just a
 ## Monad 定义
 
 Monad本身是一个type class，其定义如下所示：
-``` haskell
+```haskell
 class Monad m where
     (>>=) :: m a -> (a -> m b) -> m b
     return :: a -> m a
@@ -52,7 +52,7 @@ class Monad m where
 3. return - 又成**unit**操作，将一个数值类wrapper为一个Monad变量    
 
 比如Maybe的例子，有：
-``` haskell
+```haskell
 instance Monad Maybe where
     Nothing >>= f = Nothing
     (Just x) >>= f = f x
@@ -61,7 +61,7 @@ instance Monad Maybe where
 这里的`bind`操作对2个constructor有不同的实现（pattern match），而 return 直接作用于 Just constructor。
 
 通过Haskell提供的 `do notation`, 可以对Monad做类似于命令式语言的操作：
-``` haskell
+```haskell
 data Sheep = SheepCreator String (Sheep, Sheep) | NONE
      deriving Show
 
@@ -102,7 +102,7 @@ Monad 类必须要满足三个基本定律才能用DO来表达(具体的论证�
 
 1. fail 错误处理，Do里边的任何错误都默认立刻推出处理 - `fail s = error`   
 2. `>>` 操作用于表述不需要前一个Monadic操作提供输入的处理:    
-``` haskell
+```haskell
 (>>) :: m a -> m b -> m b
 m >> k = m >>= (\_ -> k)
 ```
@@ -110,21 +110,21 @@ m >> k = m >>= (\_ -> k)
 ## 其它的Monad定律
 
 除了上述的3个基本定律，某些Monad还提供一下额外的保证：  
-``` haskell
+```haskell
 mzero >>= f == mzero
 m >>= (\x -> mzero) == mzero
 mzero `mplus` m == m
 m `mplus` mzero == m
 ```
 这里的`mzero`是一个特殊的monad变量，其满足对于左右bind的函数都返回`mzero`，而`plus`则返回两个参数中的任意一个非mzero的变量。在Haskell中满足这两的定律的类是MonadPlus:
-``` haskell
+```haskell
 class (Monad m) => MonadPlus m where
     mzero::m a
     mplus::m a -> m a -> m a
 ```
 
 对于Maybe类型，其同样满足MonadPlus要求，对应的：
-``` haskell
+```haskell
 instance MonadPlus Maybe a where
     mzero = Nothing
     Nothing `mplus` x = x

@@ -18,7 +18,7 @@ backtrace 系列API
 
 Linux的manpage提供了如下的API原型：
 
-``` cpp 
+```cpp 
 #include <execinfo.h>
 int backtrace(void **buffer, int size);
 char **backtrace_symbols(void *const *buffer, int size);
@@ -76,7 +76,7 @@ Segmentation fault (core dumped)
 
 上述例子的输出如下：
 
-``` bash
+```bash
 Threads started!
 THREAD-3061271360: normal operation begin...
 THREAD-3069664064: normal operation begin...
@@ -123,7 +123,7 @@ Google coredump library
 
 链接在[google code](http://code.google.com/p/google-coredumper/), 用法如下：
 
-``` cpp
+```cpp
 #include <google/coredumper.h>
 ...
 WriteCoreDump('core.myprogram');

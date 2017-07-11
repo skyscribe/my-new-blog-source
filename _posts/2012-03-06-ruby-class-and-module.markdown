@@ -15,7 +15,7 @@ Class和Module是Ruby中的两个重要概念。作为一个纯**OO**语言，cl
 
 ruby中存在一些基础的类（或者是MetaClass)，包括: `[Class, Module, Kernel, Object, BasicObject]`, 且看如下测试：
 
-``` ruby
+```ruby
 tests = [Class, Module, Kernel, Object, BasicObject]
 
 puts "checking class and ancestors for #{tests}"
@@ -64,7 +64,7 @@ Kernel is not a Class
 
 Module不能用new来生成一个对象，譬如：
 
-``` ruby
+```ruby
 module TestModule
   def func()
     puts "value is @value"
@@ -86,7 +86,7 @@ Module的主要作用就是实现MIXIN。通过Module，某个class可以通过`
 
 下边的这段代码是一个简单的MIXIN例子:
 
-``` ruby
+```ruby
 class BaseClass
   def call_func()
     puts "base called"

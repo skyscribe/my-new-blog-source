@@ -76,7 +76,7 @@ update-alternatives
 ------------------------
 如果需要修改默认的page工具，在Debian以及衍生发行版上，可以使用 `update-alternatives` 工具来修改默认的系统工具程序：
 
-``` bash
+```bash
 update-alternatives --list pager
 #/bin/less
 #/bin/more

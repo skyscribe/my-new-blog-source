@@ -15,7 +15,7 @@ CMake常用技巧：
 好处是，所有的临时文件都会生成在当前运行cmake/make的目录。
 譬如在项目根目录有一个CMakeLists.txt作为top-level file, 几个代码子目录，一个build目录，可以用：
 
-``` cmake
+```cmake
 cd build
 cmake ..
 make
@@ -37,7 +37,7 @@ add_library(libname SHARED src1 src2)
 - 获取当前运行目录
 
 可以在根目录设置一个project_dir变量，设置为源代码目录，如下
-``` cmake
+```cmake
 set(project_top_dir ${CMAKE_CURRENT_SOURCE_DIR}/")
 
 add_subdirectory(sub1)
@@ -49,7 +49,7 @@ add_subdirectory(sub2)
 
 假设第三方库不是由CMake编译得来，但要检测依赖和变动，则可以用imported属性：
 
-``` cmake
+```cmake
 add_library(ssllib SHARED IMPORTED)
 add_library(cryptolib SHARED IMPORTED)
 #May have different dependent libraries

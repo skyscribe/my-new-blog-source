@@ -39,7 +39,7 @@ Tree a = Node (Tree a) (Tree a)
 ```
 
 这里的Tree中保存的是一个抽象数据。假设这里的a是个String，并且我们希望据此生成一个新的Tree，对应的每个节点中的数据存放的是对应String的长度，那么其实现可以如下：
-``` haskell
+```haskell
 treeLengths (Leaf s) = Leaf (length s)
 treeLengths (Node l r) = Node (treeLengths l) (treeLengths r)
 ```
@@ -64,7 +64,7 @@ instance Functor Tree where
 ## list & Maybe
 
 Maybe类型是一个基本类型，用于封装某个数据或者空，而List则用于描述数据列表。对于List类型，其fmap对应的实现其实就是map - **fmap可以看作是map的一个扩展**; 对于Maybe类型，fmap的定义如下：
-``` haskell
+```haskell
 instance Functor Maybe where
     fmap _ Nothing = Nothing
     fmap f (Just x) = Just (f x)
@@ -81,18 +81,18 @@ liftM f m = m >>= \i -> return (f i)
 ```
 
 对于多个变量的函数，haskell中定义了`liftM2`/`liftM3`...`liftM5`,以下是`liftM2`的定义：
-``` haskell
+```haskell
 liftM2 :: (Monad m) => (a->b->c) -> m a -> m b -> m c
 liftM2 f m1 m2 = m1 >>= \a -> m2 >>= \b -> return (f a b)
 ```
 
 这里的操作可以依次作用于2个monadic变量，并且得到一个新的moandic变量。对于无穷集合运算来说，liftM系列函数就无能无力了；这个时候 `ap`则可以派上用场：
-``` haskell
+```haskell
 ap :: Monad m => m (a -> b) -> m a -> m b
 ```
 
 如下例：
-``` haskell
+```haskell
 data MovieReview = MovieReview {
       revTitle :: String
     , revUser :: String

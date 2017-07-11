@@ -17,7 +17,7 @@ tags: [ ruby, programming, language]
 
 1. 类内define法，需要在 method name 之前显示加上 self 指明这是个属于 class 的方法：  
 
-``` ruby
+```ruby
 class Test
     def self.foo
         puts "class method called"
@@ -25,10 +25,10 @@ class Test
 end
 # call
 Test.foo
-```  
+``` 
 2. Append 法，通过 << 添加到 self，如下：  
 
-``` ruby
+```ruby
 class Test
     class << self
         def foo
@@ -39,10 +39,10 @@ end
 
 # call
 Test.foo
-```   
+```  
 3. 类外定义，和定义一个普通函数的方法类似，但是指明了 class name， 可以用于方便的向已定义好的类中添加 class method:  
 
-``` ruby
+```ruby
 class Test; end
 def Test.bar
     puts "class method called"

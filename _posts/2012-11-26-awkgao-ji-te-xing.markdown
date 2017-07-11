@@ -15,7 +15,7 @@ array类型
 
 awk自身支持类似于C语言数组的数据结构，称之为**array**，但是其下标却不仅仅限于数字，可以是字符串等其它类型；行为上来说更似于一个关联容器，从某个变量关联到另外一个变量：
 
-``` bash
+```bash
 awk 'BEGIN{
     arr['aa'] = 1
     arr[4] = 2
@@ -73,14 +73,14 @@ awk 'BEGIN{
 
 * `sub` 用于正则替换左数起第一个匹配
 
-``` bash
+```bash
 echo "The lazy dog" | awk '{sub(/[ey] /, "lagggg> ");print}'
 #Thlagggg> lazy dog
 ```
 
 * `gsub` 用于全局替换,所有满足条件的部分都被替换  
 
-``` bash
+```bash
 echo "The lazy dog" | awk '{gsub(/[ey] /, "lagggg> ");print}'
 Thlagggg> lazlagggg> dog
 ```
@@ -88,7 +88,7 @@ Thlagggg> lazlagggg> dog
 
 * `gensub` 是一个更通用形式的正则替换操作,它保持源字符串不动，将修改后的串返回
 
-``` bash
+```bash
 echo "The lazy dog" | gawk '{new = gensub(/[ey] /, "lagggg> ", "g");print; print new}'
 #The lazy dog
 #Thlagggg> lazlagggg> dog

@@ -79,7 +79,7 @@ public interface MutableCollection<E> : Collection<E>, MutableIterable<E> {//...
 public interface List<out E> : Collection<E> {//...}
 // Mutable list
 public interface MutableList<E> : List<E>, MutableCollection<E> {//...}
-``` 
+```
 
 需要注意的是，实际的具体实现类是复用Java中的定义，可参考collection包中的 `TypeAliases.kt` 文件
 
