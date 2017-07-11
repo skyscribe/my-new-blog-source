@@ -1,34 +1,48 @@
 @startuml
-title asynchronous and blocking for completion call
+title asynchronous and non-blocking call
+
 control cpu
 actor AsyncActor
+
 ref over InterfaceScheduler, ServiceImpl: registeration of service
+
 == store for deferred call ==
 AsyncActor -> AsyncActor: time to call
 activate AsyncActor #Yellow
 AsyncActor -> AsyncActor : prepare onActionDone
-AsyncActor -> InterfaceScheduler : interfaceCall(async = true, waitforDone = true, onActionDone)
+AsyncActor -> InterfaceScheduler : interfaceCall(async = true, onActionDone)
+
 activate InterfaceScheduler #Yellow
-InterfaceScheduler -> AsyncWorker : doSyncJob(action, onActionDone)
-InterfaceScheduler -> InterfaceScheduler : block context
+InterfaceScheduler -> AsyncWorker : doJob(action, onActionDone)
+
 activate AsyncWorker #Yellow
-AsyncWorker -> AsyncWorker : prepare wakeupAction and wrapActionDone
 AsyncWorker -> AsyncWorker : save <action, onActionDone>
+AsyncWorker --> InterfaceScheduler
+InterfaceScheduler --> AsyncActor
+
+deactivate InterfaceScheduler
+deactivate AsyncActor
+
 cpu --[#Blue]> AsyncWorker : context switch
 activate AsyncWorker #Blue
-== blocked call wakeup==
+
+== deferred call ==
+
 AsyncWorker -> AsyncWorker : scheduleOutstandingJobs
+
 AsyncWorker --[#Red]> ServiceImpl : action()
 note left #FFAAAA
     concurrent data access
-     in unless call
-     in a strand
+     in ServiceImpl, critical
+     data area
 end note
-AsyncWorker --[#Red]> AsyncWorker : onActionDone() [wrapped]
-AsyncWorker -> AsyncWorker : invoke wakeupAction
-AsyncWorker --> AsyncActor : onActionDone
-note right: sequential access to data
+
+AsyncWorker --[#Red]> AsyncActor : onActionDone()
+note left #FFAAAA
+    concurrent data access
+     in AsyncWorker, critical 
+     data area
+end note
+
 deactivate AsyncWorker
-deactivate InterfaceScheduler
-deactivate AsyncActor
 @enduml
