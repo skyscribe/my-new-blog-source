@@ -146,11 +146,15 @@ public final class Optional<T> {
 
 有如下模式可以供我们组合使用
 
-- `filter` 提供过滤器功能，可以依照用户传入的一个谓词函数对容器中的对象进行过滤，如果谓词判断为真，则原封不动返回原容器，如果是假，则返回空容器
-- `map` 提供对象转换功能，其参数是一个转换函数，实现一个对象到另外一个对象的转换；
+#### 对封装数据的修改/转换相关的模式
+
+`filter` 提供过滤器功能，可以依照用户传入的一个谓词函数对容器中的对象进行过滤，如果谓词判断为真，则原封不动返回原容器，如果是假，则返回空容器
+
+`map` 提供对象转换功能，其参数是一个转换函数，实现一个对象到另外一个对象的转换；
 这里`Optional`保证传给参数函数的输入值一定不会是空对象，即**转换函数不需要做null判断**因为map实现本身已经帮你判断了。
 从函数式编程的角度来看，`map`是一个高阶函数 - 其参数是另外一个函数
-- `flatMap` 和上边的`map`类似，差别在于传入的参数函数的返回这无法确保非null的情况下选择了一个新的`Optional`类型作为返回；
+
+`flatMap` 和上边的`map`类似，差别在于传入的参数函数的返回这无法确保非null的情况下选择了一个新的`Optional`类型作为返回；
 为避免`Optional<Optional<T>>`的麻烦，`flatMap`会将这个二层封装给解开，生成一个单一的封装。
 其实现代码非常简单
 ```java
@@ -164,15 +168,82 @@ public<U> Optional<U> map(Function<? super T, ? extends U> mapper) {
 }
 ```
 
-- `orElse` 提供容器封装对象的提取；如果原来的容器里存有合法的对象，则直接返回此对象；如果没有则返回参数提供的默认值。
+#### 数据提取相关的模式
+`orElse` 提供容器封装对象的提取；如果原来的容器里存有合法的对象，则直接返回此对象；如果没有则返回参数提供的默认值。
 这里的提取实际上是一个解封装操作；返回的对象同样也抱枕是非null的，**拿到这个对象的调用者不需要做额外的null判断**
 
-- `orElseGet` 是一个类似的提取操作，和`orElse`不同的是对于空容器的处理，返回值由一个传入的`Supplier`来提供；同样**也要保证尽量不要提供nulli**
+`orElseGet` 是一个类似的提取操作，和`orElse`不同的是对于空容器的处理，返回值由一个传入的`Supplier`来提供；同样**也要保证尽量不要提供nulli**
 以免让使用者操心null判断的事儿。从函数式编程的角度来看，这也是一个高阶函数。
 
-- `orElseThrow` 则提供了一个和传统的异常相结合的方式，同样不需要外层调用者自己加逻辑判断，容器会在有对象的情况下返回对象出来，
+`orElseThrow` 则提供了一个和传统的异常相结合的方式，同样不需要外层调用者自己加逻辑判断，容器会在有对象的情况下返回对象出来，
 没有则调用传入的`Supplier<? extends Throwable>`抛出一个异常。这同样是一个高阶函数
 
-T.B.D
 
+上述的模式提供了丰富的组合功能使我们对一个`Optional`对象做函数式编程变得简单明了；甚至不需要一个`if`/`else`分支判断就可以做一些复杂的操作。
+比如下面的一段代码
+```java
+AnotherResult result = Optional.ofNullable(someObj.doSth(parX))
+  .filter(someResult -> someResult.meetSomeCondition())
+  .map(conditionalResult -> transformAsAnotherResult(conditionalResult))
+  //.flatMap(conditionalResult -> transformAsAnotherResult(conditionalResult)) if transformAsAnotherResult returns optional
+  .orElseGet(() -> new anotherEmptyResult());
+  //.orElseThrow(() -> new SomeRunTimeException()); //if we want to throw
+
+//Now result wouldn't be null at all!
+```
+
+#### 反模式
+`Optional`可以帮助我们大大简化代码，然而也有一些**反模式需要小心留意**；比如以下这些
+
+- 混用异常和`Optional`类型返回 - 显然两种机制是鱼和熊掌的关系，设计方法的时候必须选择其中一个，而不是两者混用。
+如果**选择让方法返回Optional类型，就不要在实现内部再抛出异常**，否则你的用户将会抓狂。
+
+- 在Optional的值中存放`null` - 这是明显违背设计契约的做法，导致`Optional`封装完全失去意义。如果想重新构造一个Optional,
+如果不能确保它不是null，请用`ofNullable`
+
+- 在模式提供的高阶函数的实现中检查参数是否为null - 明显这里是不必要的，因为`Optional`已经给你保证了传给你的参数不会是`null`。
+譬如下边的实现纯粹是画蛇添足
+```java
+anOptional.map(v -> doSth(v));
+
+private SomeType doSthn(ValueType v) {
+  if (v != null) {
+    //do something and generates return type
+  } else {
+    //This won't be ran!
+  }
+}
+```
+
+- 混用`if/else`和Optional的`isPresent()`和`get()` - 这是一种非常常见的误用；往往使得代码变得更加复杂。
+因为`Optional`本身就是设计来处理可能的例外情况，更合适的方法是用好上述的模式。
+如果需要提取出值对象，就用`orElse`系列方法；如果不需要产生任何类型的新值，可以用`ifPresent`传入lambda表达式;如果需要将结果从一种类型变化为另外一种，就采用上述的转换模式。
+
+- 复杂的链式操作，即多个连续的`map`操作 - 这种情况下代码的可读性也变差；根源是不同层次的细节被堆积在一个抽象层次中了；用简单的**重构技巧抽出新的子函数**即可。
+逻辑上来说，`anOptional.map(a -> transformAsB(a)).map(b -> transformAsC(b))` 等价于 `anOptional.map(a -> composeTransformAAndB(a))`；这里的字函数都不需要做null判断
+
+- 用`Optional`类型作函数的参数 - 这个是一个轻微的反模式，IntelliJ IDEA甚至会温馨的提示你需要重构。
+原因也比较简单，Optional类型和外部函数组合的时候，都期望通过合适的变换/提取函数将值取出来传出去，是否存在的事儿，用已有的模式去做就可以了。
+任何用`Optional`在函数中传递的写法，都**对应一个更简单的复合Optional模式**的写法;为什么不采用这些模式而要自己写判断？
+
+比如如下的例子
+```java
+Optional<SomeType> anOptional = ///initialize;
+RetType b = doSth(anOptional);
+
+private RetType doSthn(Optional<SomeType> opt){
+  return opt.map(obj -> obj.transform()).orElse(new RetType());
+}
+```
+
+可以重构为更符合局部性的形式
+```java
+Optional<SomeType> anOptional = ///initialize;
+RetType b = anOptional.map(v -> doSthn(v)).orElse(new RetType());
+
+private RetType doSthn(SomeType obj){
+  return obj.transform();
+}
+```
 ## Streams API
+T.B.D
