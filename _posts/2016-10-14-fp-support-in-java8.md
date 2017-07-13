@@ -14,7 +14,7 @@ Java8是日益臃肿、略显老态的老牌程序语言对日益流行的**新�
 Java并不打算放弃其面向对象的内核 - 所以的东西必须都是对象，那么函数也不例外，它依然是对象。具体而言，是一个特殊的函数式接口的实现。
 
 ### 函数依然是对象
-在新的`java.util.function`包里，预定义了形形色色的函数接口,譬如带2个参数的函数
+在新的`java.util.function`包里，预定义了形形色色的函数接口，譬如带2个参数的函数的定义如下
 
 ```java
 @FunctionalInterface
@@ -198,11 +198,12 @@ AnotherResult result = Optional.ofNullable(someObj.doSth(parX))
 - 混用异常和`Optional`类型返回 - 显然两种机制是鱼和熊掌的关系，设计方法的时候必须选择其中一个，而不是两者混用。
 如果**选择让方法返回Optional类型，就不要在实现内部再抛出异常**，否则你的用户将会抓狂。
 
-- 在Optional的值中存放`null` - 这是明显违背设计契约的做法，导致`Optional`封装完全失去意义。如果想重新构造一个Optional,
+- 在Optional的值中存放`null` - 这是明显**违背设计契约**的做法，导致`Optional`封装完全失去意义。如果想重新构造一个Optional,
 如果不能确保它不是null，请用`ofNullable`
 
-- 在模式提供的高阶函数的实现中检查参数是否为null - 明显这里是不必要的，因为`Optional`已经给你保证了传给你的参数不会是`null`。
+- 在模式提供的高阶函数的实现中检查参数是否为null - 这里是做了不必要的额外检查，因为`Optional`已经给你保证了传给你的参数不会是`null`。
 譬如下边的实现纯粹是画蛇添足
+
 ```java
 anOptional.map(v -> doSth(v));
 
@@ -217,6 +218,7 @@ private SomeType doSthn(ValueType v) {
 
 - 混用`if/else`和Optional的`isPresent()`和`get()` - 这是一种非常常见的误用；往往使得代码变得更加复杂。
 因为`Optional`本身就是设计来处理可能的例外情况，更合适的方法是用好上述的模式。
+
 如果需要提取出值对象，就用`orElse`系列方法；如果不需要产生任何类型的新值，可以用`ifPresent`传入lambda表达式;如果需要将结果从一种类型变化为另外一种，就采用上述的转换模式。
 
 - 复杂的链式操作，即多个连续的`map`操作 - 这种情况下代码的可读性也变差；根源是不同层次的细节被堆积在一个抽象层次中了；用简单的**重构技巧抽出新的子函数**即可。
@@ -236,7 +238,7 @@ private RetType doSthn(Optional<SomeType> opt){
 }
 ```
 
-可以重构为更符合局部性的形式
+可以重构为更符合[局部性原理](https://en.wikipedia.org/wiki/Locality_of_reference)的形式,避免`Optional`类型的蔓延
 ```java
 Optional<SomeType> anOptional = ///initialize;
 RetType b = anOptional.map(v -> doSthn(v)).orElse(new RetType());
@@ -246,4 +248,76 @@ private RetType doSthn(SomeType obj){
 }
 ```
 ## Streams API
-T.B.D
+Java8新提供了`Streams` API来实现更类似于Haskell的[List Monad](http://learnyouahaskell.com/a-fistful-of-monads)风格的函数式编程设施；
+值得注意的是，在老版本的Java库里边，`List`这个接口已经用来描述传统的基于共享内存模型的数据结构了（和C++的类似）；
+这也许是Java8另起炉灶新添加新的接口来描述这一概念。
+
+类似于Functional Interface,Streams API也是包含一系列**新的Java接口**的包的简称；这些接口都放在`java.util.stream`包中。
+
+### 基本概念
+Stream是一个函数式编程概念的接口抽象；它和集合类的概念比较类似；比较大的差异在于Stream是
+- 关于**操作的抽象**而不是关于数据的抽象，可以将其看作一个流水线，
+一些数据流入抽象的Stream,经过某些操作变换产生某些输出；这些输出可能成为流的下一步处理的输入
+
+- 无状态的，所有绑定的**操作不能修改数据源**，即只能决定产生的输出是什么样子，不能回头修改输入的数据；
+这也是纯函数式编程所要求的**无副作用**；同样的数据经过某个处理操作产生的输出一定要是一样的。
+
+- **惰性运算**赋值的，即Stream上的操作不一定会消耗所有的输入数据，譬如我们在一个Stream上取前3个数据，
+那么即使输入数据有无穷多个，操作也能在取到3个的时候就结束返回给下一步处理。
+
+- 可能有无限多个输入，只要后续的操作是有限的
+
+- 同一个Stream的输入**只能被使用一次**，下一次若想操作必须重新生成Stream；从这点设计约束看，Java的Stream没有Haskell的纯粹;
+也可以认为流水线一旦被处理，最原始的数据就不存在了。
+
+### 基本的Stream类型
+所有的`Stream`接口都继承自一个公共的**泛型接口** 
+```java
+public interface BaseStream<T, S extends BaseStream<T, S>> extends AutoClosurable {
+  Iterator<T> iterator();
+  Iterator<T> spliterator();
+
+  @Override
+  void close();
+  S onClose(Runnable closeHandler);
+
+  //...other common interfaces...
+}
+```
+其中`T`用于声明其初始输入的元素的类型，`S`则用于将子类的类型带上来，和C++的[CRTP](https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern)技巧类似。
+从接口声明上看，一个Stream类也
+- 提供了迭代器访问接口，可以用传统的迭代器访问模式操作`Stream`
+- 实现了`AutoClosurable`接口；从而我们可以结合Java8的try-with-resource表达式方便的自动管理资源。
+**大部分的Stream实现并不会管理资源**，因而不显示关闭Stream往往也不会带来什么问题。
+
+#### `Stream<T>`接口
+最平凡的Stream是名为`Stream<T>`的泛型接口
+```java
+public interface Stream<T> extends BaseStream<T, Stream<T>> {
+  //operations...
+  //terminators...
+  public interface Builder<T> extends Consumer<T> {
+    @Override
+    void accept(T t);
+
+    default Builder<T> add(T t){
+      accept(t);
+      return this;
+    }
+
+    Stream<T> build();
+  }
+}
+```
+
+该接口包含一些**转换操作和终止操作**组成；转换操作将Stream中的数据作为输入，经过变换或过滤等产生新的输出；并准备好下一次转换操作或终止流水线；
+终止操作则直接终止流水线，返回某些汇聚之后的结果出来。
+
+### 构造和生成Stream
+
+### 流水线操作和变换
+
+### 归并
+
+### 副作用和顺序性
+
