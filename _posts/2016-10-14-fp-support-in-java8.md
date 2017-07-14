@@ -108,18 +108,24 @@ Java的异常在设计上被分类为检查异常和非检查异常；前者别�
 非检查异常用来表述编程上的错误；严格来说非检查异常应该是代码的某些地方处理除了问题；需要通过修改代码来解决问题。
 
 Sun是这样设计Java的异常机制的，开源社区却对这种编译器强制检查的异常颇有微词，甚至很多有名的开源项目都**主张永远不使用检查异常**；
-遍布`try/catch`块的代码的可读性非常差，可怜的业务逻辑很容易淹没在异常处理代码的包围圈里。仅使用非检查异常的副作用是，程序很容易因为没有正确处理的异常而崩溃。
+遍布`try/catch`块的代码的可读性非常差，可怜的业务逻辑很容易淹没在异常处理代码的包围圈里。
+
+仅使用非检查异常的副作用是，程序很容易因为没有正确处理的异常而崩溃。
 于是很多程序员会转而采用破坏对象状态的方式，到处传递空指针；为了避免空指针异常导致的程序崩溃，我们有不得不在代码中加上很多引用是否为空的判断，写出越来越难维护的代码。
 
-> I call it my billion-dollar mistake. It was the invention of the null reference in 1965. At that time, I was designing the first comprehensive type system for references in an object oriented language (ALGOL W). My goal was to ensure that all use of references should be absolutely safe, with checking performed automatically by the compiler. But I couldn't resist the temptation to put in a null reference, simply because it was so easy to implement. This has led to innumerable errors, vulnerabilities, and system crashes, which have probably caused a billion dollars of pain and damage in the last forty years.
-> -- Tony Honare, apology for inventing the null reference
+> I call it my billion-dollar mistake. It was the invention of the null reference in 1965. ... My goal was to ensure that all use of references should be absolutely safe,
+> with checking performed automatically by the compiler. But I couldn't resist the temptation to put in a null reference, **simply because it was so easy to implement.** 
+> This has led to innumerable errors, vulnerabilities, and system crashes, which have probably caused a billion dollars of pain and damage in the last forty years.
+> > -- Tony Honare, apology for inventing the null reference
 
 ### 用Optional来处理错误
+
 传统的C/C++语言中，返回值也是一种处理错误的方式；其不足之处是，正常处理和异常情况的处理会产生很多复杂的逻辑判断，导致正常的逻辑难以理清；Java不建议集成这笔古老的遗产。
+
 `Optional`类则提供了**一种新的错误处理方式**；从概念上来说，这三种方式是不能同时采用的，要么采用`Optional`要么采用异常，但是不应该两者都采用。
 
 从概念上来说，一个`Optional`对象是关于某种具体对象的一个容器，它要么包含一个已经初始化的对象，要么什么也没有。
-看起来和null引用没什么区别；主要的差异在于类型系统上 - Java是个静态语言，null对象不是一个合法初始化过的对象，对它做任何方法调用都会引起引用异常；
+看起来和null引用没什么区别；主要的差异在于类型系统上 - Java是种静态语言，**null对象不是一个合法初始化过的对象**，对它做任何方法调用都会引起引用异常；
 `Optional`则不同，即使没有正确的初始化某个对象，它**本身依然是一个合法的对象**。它用一套统一的接口来操作内部封装的对象。
 
 具体到Java8的定义它本质上是一个不可被外部构造和继承的一个具体的类，可以参考JDK的源码
@@ -195,14 +201,18 @@ AnotherResult result = Optional.ofNullable(someObj.doSth(parX))
 #### 反模式
 `Optional`可以帮助我们大大简化代码，然而也有一些**反模式需要小心留意**；比如以下这些
 
-- 混用异常和`Optional`类型返回 - 显然两种机制是鱼和熊掌的关系，设计方法的时候必须选择其中一个，而不是两者混用。
+##### 违反基本的约束
+以下列举了几个常见的基本错误，这些错误只要稍微深入理解下`Optional`的设计思想就可以避免
+
+1. 混用异常和`Optional`类型返回 - 显然两种机制是鱼和熊掌的关系，设计方法的时候必须选择其中一个，而不是两者混用。
 如果**选择让方法返回Optional类型，就不要在实现内部再抛出异常**，否则你的用户将会抓狂。
 
-- 在Optional的值中存放`null` - 这是明显**违背设计契约**的做法，导致`Optional`封装完全失去意义。如果想重新构造一个Optional,
+2. 在Optional的值中存放`null` - 这是明显**违背设计契约**的做法，导致`Optional`封装完全失去意义。如果想重新构造一个Optional,
 如果不能确保它不是null，请用`ofNullable`
 
-- 在模式提供的高阶函数的实现中检查参数是否为null - 这里是做了不必要的额外检查，因为`Optional`已经给你保证了传给你的参数不会是`null`。
-譬如下边的实现纯粹是画蛇添足
+3. 在模式提供的高阶函数的实现中检查参数是否为null - 这里是做了不必要的额外检查，因为`Optional`已经给你保证了传给你的参数不会是`null`。
+
+ 譬如下边的实现纯粹是画蛇添足
 
 ```java
 anOptional.map(v -> doSth(v));
@@ -216,19 +226,22 @@ private SomeType doSthn(ValueType v) {
 }
 ```
 
-- 混用`if/else`和Optional的`isPresent()`和`get()` - 这是一种非常常见的误用；往往使得代码变得更加复杂。
+##### 冗余的判断
+还有一些典型的误用和**不熟悉函数式编程的惯用法**有关，可以通过简单的重构解决
+
+1. 混用`if/else`和Optional的`isPresent()`和`get()` - 这是一种非常常见的误用；往往使得代码变得更加复杂。
 因为`Optional`本身就是设计来处理可能的例外情况，更合适的方法是用好上述的模式。
 
-如果需要提取出值对象，就用`orElse`系列方法；如果不需要产生任何类型的新值，可以用`ifPresent`传入lambda表达式;如果需要将结果从一种类型变化为另外一种，就采用上述的转换模式。
+ 如果需要提取出值对象，就用`orElse`系列方法；如果不需要产生任何类型的新值，可以用`ifPresent`传入lambda表达式;如果需要将结果从一种类型变化为另外一种，就采用上述的转换模式。
 
-- 复杂的链式操作，即多个连续的`map`操作 - 这种情况下代码的可读性也变差；根源是不同层次的细节被堆积在一个抽象层次中了；用简单的**重构技巧抽出新的子函数**即可。
+2. 复杂的链式操作，即多个连续的`map`操作 - 这种情况下代码的可读性也变差；根源是不同层次的细节被堆积在一个抽象层次中了；用简单的**重构技巧抽出新的子函数**即可。
 逻辑上来说，`anOptional.map(a -> transformAsB(a)).map(b -> transformAsC(b))` 等价于 `anOptional.map(a -> composeTransformAAndB(a))`；这里的字函数都不需要做null判断
 
-- 用`Optional`类型作函数的参数 - 这个是一个轻微的反模式，IntelliJ IDEA甚至会温馨的提示你需要重构。
+3. 用`Optional`类型作函数的参数 - 这个是一个轻微的反模式，IntelliJ IDEA甚至会温馨的提示你需要重构。
 原因也比较简单，Optional类型和外部函数组合的时候，都期望通过合适的变换/提取函数将值取出来传出去，是否存在的事儿，用已有的模式去做就可以了。
 任何用`Optional`在函数中传递的写法，都**对应一个更简单的复合Optional模式**的写法;为什么不采用这些模式而要自己写判断？
 
-比如如下的例子
+  比如如下的例子
 ```java
 Optional<SomeType> anOptional = ///initialize;
 RetType b = doSth(anOptional);
@@ -238,7 +251,7 @@ private RetType doSthn(Optional<SomeType> opt){
 }
 ```
 
-可以重构为更符合[局部性原理](https://en.wikipedia.org/wiki/Locality_of_reference)的形式,避免`Optional`类型的蔓延
+  可以重构为更符合[局部性原理](https://en.wikipedia.org/wiki/Locality_of_reference)的形式,避免`Optional`类型的蔓延
 ```java
 Optional<SomeType> anOptional = ///initialize;
 RetType b = anOptional.map(v -> doSthn(v)).orElse(new RetType());
@@ -288,10 +301,13 @@ public interface BaseStream<T, S extends BaseStream<T, S>> extends AutoClosurabl
 从接口声明上看，一个Stream类也
 - 提供了迭代器访问接口，可以用传统的迭代器访问模式操作`Stream`
 - 实现了`AutoClosurable`接口；从而我们可以结合Java8的try-with-resource表达式方便的自动管理资源。
-**大部分的Stream实现并不会管理资源**，因而不显示关闭Stream往往也不会带来什么问题。
+
+  **大部分的Stream实现并不会管理资源**，因而不显示关闭Stream往往也不会带来什么问题。
 
 #### `Stream<T>`接口
+
 最平凡的Stream是名为`Stream<T>`的泛型接口
+
 ```java
 public interface Stream<T> extends BaseStream<T, Stream<T>> {
   //operations...
@@ -313,11 +329,184 @@ public interface Stream<T> extends BaseStream<T, Stream<T>> {
 该接口包含一些**转换操作和终止操作**组成；转换操作将Stream中的数据作为输入，经过变换或过滤等产生新的输出；并准备好下一次转换操作或终止流水线；
 终止操作则直接终止流水线，返回某些汇聚之后的结果出来。
 
-### 构造和生成Stream
+#### 以Java基本类型为数据元素的特殊Stream
+Java泛型技术的一个限制是，对基本的数据类型（这些类型不是一个Object）必须用包装类，
+直接用包装类替换基本类型则会带来比较大的[性能开销](https://tavianator.com/java-autoboxing-performance/)；
+尤其是Java5之后引入的自动装箱对程序员隐藏了这些实现细节，某种程度上加剧了问题的严重性。
+
+`Stream`对所有的基本类型都提供了一个对应的接口，比如`IntStream`、`LongStream`等等。这些接口都继承自`BasicStream`,暴露的方法和`Stream`比较类似；从接口声明上看，
+很多方法和`Stream<T>`都是类似的，仅仅是针对类型做了特殊处理，这个也是很老的一个对Java语言设计的槽点了。
+
+### 生成Stream
+大部分情况下，用户不需要手工创建Stream对象；它们可以用不同的方式产生
+
+- 使用`Collection`接口的`.stream()`方法；还有一个对应的`.parallelStream()`返回一个可以并发执行的对象
+
+- 使用`Arrays`工具类的`.stream(Object[])`从一个数组构造出来
+
+- 使用`Stream`本身的一些静态方法产生，包括
+ 1. `Stream.of(T t)`产生单个元素的Stream对象
+ 2. `Stream.of(T... values)`从对象列表中产生
+ 3. `Stream.generate(Supplier<T> s)` 用给定的`Supplier`函数产生无穷序列(其实受`Long`类型的最大可能值限制)
+ 4. `Stream.concat(Stream<? extends T> a, Stream<? extends T> b)`连接两个已有的流
+
+ 这些方法也有对应的针对基本类型的Stream的版本。
+
+- 使用`StreamSupport`辅助类来产生，包括
+ 1. `stream(Spliterator<T> spliterator, boolean parallel)`从一个迭代器产生，可以支持并发的`Stream`
+ 2. `stream(Supplier<? extends Spliterator<T>> supplier, int characteristics, boolean parallel)`支持从给定的迭代器的Supplier中一一调用`.get()`方法；支持并发方式迭代
+ 3. 类似功能的针对基本类型的Stream的封装
+
+- 特定场景的构造方法，比如
+ 1. 随机数产生器流，用`Random.ints()`
+ 2. 缓冲的IO流中产生的流 - `BufferedReader.lines()`
+ 3. 其它形形色色的JDK库提供的封装；以及第三方库提供的封装
+
+- `Builder`接口
+该接口是`Stream<T>`的内部接口，扩展了`Consumer<T>`；可以利用`add(T t)`方法添加元素到Stream中；该操作支持链式调用，最后用`build()`方法生成最终的Stream对象。
+实现在`Consumer`的接口则具有和`add`类似的语意，只是不支持链式操作。比如`IntStream.Builder.add(1).add(2).add(3).build`生成一个包含3个数字为输入的Stream。
 
 ### 流水线操作和变换
+作为一种函数式编程工具，Stream就天然是为组合而生的；这些组合本身就构成了流水线处理 - 初始化的元素作为流水线的输入，而中间的转换步骤可以有任意多个，
+最终则往往会有一个终止操作来产生期望的输出 - 该输出也是我们从流水线上拿到最终结果的地方。
+
+#### 中间操作和终止操作
+所有这些中间操作每次返回一个新的`Stream`状态，其输入是经过转换的 - 如前所述`Stream`的输入是不可修改的；该新的Stream的输入是对前一次的输入，
+输出则由前一次操作的针对每一个输入做运算之后的输出组成；如果某些运算不产生输出，则这些数据就像筛子一样被过滤下来了。
+
+所有的终止操作从函数签名上来看，都不会返回新的Stream对象。
+
+所有的中间操作都符合**延迟计算**规则；即真正的输出并没有在调用这些转换操作的时候被计算出来；
+只有**当终止操作被调用以取出需要的值的时候**，这些转换操作才真正被计算出来。
+
+当我们提供一个无限长的输入提供给Stream的时候，真正参与具体操作的元素个数仅仅以满足终止条件为准。
+
+譬如下边的代码
+```java
+int first5PrimeSum = IntStream.iterate(1, i -> i+1)
+    .filter(x -> isPrime(x))
+    .limit(5)
+    .sum();
+```
+
+初始构造的Stream包含无穷多个元素（受限于int类型的长度），但是经过`filter`操作之后，由用`limit`取出前5个，并最终求和；
+那么实际参与运算的初始输入元素只有1到11而已。
+
+根据以上的赋值求值规则，我们可以认为终止操作是**贪婪求值**的并会产生副作用；一旦调用了终止操作，Stream对象即产生了最终的运算结果；
+原始的输入元素遭到了破坏，无法回头重新来过。
+例外的情况隐藏在`iterator()`和`splititerator()`操作上，它们虽然是终止操作，却不会破坏流水线的状态，用户可以用`iterator`接口来决定流水线的运算时间点。
+
+#### 中间操作模式
+`Stream`接口提供了很多传统的符合函数式编程风格的方法，一些甚至允许更灵活的高阶函数
+- `map`用于普通的函数变化，其参数是一个转换函数，将数据从一种类型转换为新的类型
+- `flatMap(Function<? super T, ? extend Stream<? extends R>> mapper)`将Stream的每一个元素应用之转换函数，然后将转换结果流中的数据取出来汇聚为新的Stream。
+ 该操作是一种相对高阶的模式，可以避免手工来拼接流
+- `skip`/`limit`分别用于截取或者跳过某些元素
+- `sorted`则产生按照给定排序规则排列为有序输出数据的流
+- `filter`用来过滤流中满足给定谓词逻辑判断的数据
+- `distinct`会删除重复的元素
+- `peek`用于在产生输出数据的同时，做一些参数指定的函数操作；该操作大部分时候可以用于方便debug，比如
+```java
+Stream.of("one", "two", "three")
+  .filter(e -> e.lenth() > 3)
+  .peek(e -> System.out.println("Filtered value: " + e))
+  .map(String::toUpperCase())
+  .peek(e -> System.out.println("Mapped value: " + e))
+  .collect(Collectors.toList());
+```
+
+#### 有状态和无状态的中间操作
+
+中间操作可以携带lambda表达式，从而可以简单将其分类为有状态的和无状态的操作。
+有状态的操作会**携带额外的上下文信息**，如果这些操作的运算结果跟操作的中间结果有关，则Stream的行为会变得依赖于流水线的执行顺序 - 如果操作被并发调度，
+结果就会显得不确定。
+
+比如这个例子
+```python
+Set<Integer> seen = Collections.synchronizedSet(new HashSet<>());
+stream.parallel().map(e -> if (seen.add(e)) {
+      return 0; 
+    } else {
+      return e;
+    })
+  .reduction(...)
+```
+第一个`map`操作时间的执行体中会根据给定的元素是否已经处理过来决定返回0或元素本身；这个lambda操作本身依赖于之前的运算所以是有状态的。
+
+显然有状态的操作在用`parallelStream`调度计算的时候**会产生不确定结果**；而无状态的操作则没有这样的副作用。
+
+Java8引入`Stream`的首要目的就是并行计算和并发，默认串行的操作，仅仅需要在生成`Stream`的地方加上`parallel()`就可以自动获得多核并发调度的好处。
+
+#### 潜在的操作干扰
+
+传给Stream的数据在Stream运算的过程中被视为静态的；如果这些数据可能被同时修改，则操作的正确性就难以保证了。
+考虑一个用Java的ArrayList产生的Stream做运算的情况
+
+```java
+List<String> strList = new ArrayList(Arrays.asList("one", "two", "three");
+Stream<String> strm = strList.stream();
+strList.add("four"); //WoW!
+String result = strm.collect(joining(" "));
+```
+有状态的函数操作或者互相干扰的函数操作会**破坏并发安全性并带来出乎意料的行为**（因为多线程、同步、调度的细节被隐藏了）；应该不建议使用。
+
+#### 常用的终止操作
+终止操作的方法很多，基本上`Stream`的API中，除了静态方法以外，所有的返回类型不是`Stream`的都是终止操作，常用的有
+- `allMatch`/`anyMatch/nonMatch`接受一个谓词函数作为参数，返回是否流中的元素都满足给定的条件，或至少有一个满足条件;以及是否没有满足条件的元素
+- `collect(Collector<? super T, A, R>)`用于收集流参数到给定的集合中;这里的`Collector`是一个可修改的归并操作运算抽象；
+ 常用的方式是使用`Collectors`这一工具类提供的静态方法传入各种各样的`Collector`
+- `collect(Supplier<R> supplier, BiConsumer<R, ? extends T> accumulator, BiConsumer<R, R> combiner)`是上述接口的一个简化版本，显示提供了归并操作的其中三个函数参数
+- `count`返回元素的个数
+- `toArray`返回元素为数组形式
+- `forEach`则提供遍历操作
+- `findFirst`/`findAny`返回第一个/任意一个元素，由于可能不存在希望取的元素（没有元素的情况），返回类型是`Optional<T>`
+- `reduce`归并操作，包含几个重载形式
 
 ### 归并
+归并操作是map/reduce模式中比较复杂和灵活的终止操作；`Stream`接口也提供了丰富的支持。其实这里的`reduce`在其它的函数式语言中也被称为`fold`。
 
-### 副作用和顺序性
+#### 最灵活的形式
+
+一般形式的`reduce`操作支持如下几个参数
+- `U identity`是单位元元素，同时作为输出的默认值
+- `BiFunction<U, ? super T, U> accumulator` 负责中间的每一次运算的累加
+- `BinaryOperator<U> combiner` 约束accumulator 和 identity的函数，需要满足 `combiner.apply(u, accumulator.apply(identity, t)) = accumulator.apply(u, t)`
+
+调用的效果类似于
+
+```java
+U result = identity;
+for (T element: this stream)
+  result = combiner.apply(result, accumulator.apply(identity, t))
+return result
+```
+
+#### 省略`combiner`的版本: `T reduce(T identity, BinaryOperator<T> accumulator)`
+该形式下，accumulator的类型是`BinaryOperator<T>`,同时`identity`的类型必须和Stream中的元素类型相同。
+
+`sum`/`max`/`min`等都可视作是该版本的特化实现；即
+```java
+Integer sum = integers.reduce(0, (a, b) -> a + b);
+//same as
+Integer sum = integers.reduce(0, Integer::sum);
+```
+
+#### 只有`accumulator`的版本
+这种情况下，返回的类型是`Optional<T>`;由于没有默认值，因此返回合适的结果必须至少有2个元素可以参与累加器运算；如果少于2个则返回空的Optional。
+等价的代码为
+
+```java
+boolean found = false;
+T result = null;
+for (T element: this stream) {
+  if (!found) {
+    found = true;
+    result = element;
+  } else {
+    result = accumulator.apply(result, element);
+  }
+}
+return Optional.ofNullable(result);
+```
+该种形式的操作将Stream和Optional结合了起来。
 
