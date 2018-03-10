@@ -18,9 +18,10 @@ teaser                   : # path of fallback teaser image, e.g. "/assets/images
 breadcrumbs              : false # true, false (default)
 words_per_minute         : 400
 comments:
-  provider               : "disqus" # "discourse", "facebook", "google-plus", "staticman", "custom"
+  provider               : "staticman" # "discourse", "facebook", "google-plus", "staticman", "custom"
   disqus:
     shortname            : "skyscribe"
+
 staticman:
   allowedFields          : ['name', 'email', 'url', 'message']
   branch                 : "master"
@@ -37,6 +38,7 @@ staticman:
       type               : "date"
       options:
         format           : "iso8601" # "iso8601" (default), "timestamp-seconds", "timestamp-milliseconds"
+
 atom_feed:
   path                   : # blank (default) uses feed.xml
 
