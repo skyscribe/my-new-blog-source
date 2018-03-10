@@ -13,24 +13,24 @@ name                     : "skyscribe"
 description              : "汇小流以成江海，积跬步以至千里"
 url                      : "http://www.skyscribe.me" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
-repository               : "skyscribe/skyscribe" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
+repository               : "skyscribe/skyscribe.github.io" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 breadcrumbs              : false # true, false (default)
 words_per_minute         : 400
 comments:
-  provider               : "staticman" # "discourse", "facebook", "google-plus", "staticman", "custom"
+  provider               : "staticman_v2" # "discourse", "facebook", "google-plus", "staticman", "custom"
   disqus:
     shortname            : "skyscribe"
-
 staticman:
   allowedFields          : ['name', 'email', 'url', 'message']
   branch                 : "master"
   commitMessage          : "New comment."
   filename               : comment-{@timestamp}
-  format                 : "yml"
+  format                 : "yaml"
   moderation             : true
-  path                   : "docs/_data/comments/{options.slug}" # "/_data/comments/{options.slug}" (default)
+  path                   : "_data/comments/{options.slug}" # "/_data/comments/{options.slug}" (default)
   requiredFields         : ['name', 'email', 'message']
+  name                   : "www.skyscrbe.me"
   transforms:
     email                : "md5"
   generatedFields:
@@ -57,8 +57,6 @@ analytics:
   provider               : "google" # false (default), "google", "google-universal", "custom"
   google:
     tracking_id          : UA-101727556-1
-
-
 # Site Author
 author:
   name             : "Fei Yan"
@@ -162,7 +160,7 @@ timezone: # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 
 # Plugins
-gems:
+plugins:
   - jekyll-paginate
   - jekyll-sitemap
   - jekyll-gist
