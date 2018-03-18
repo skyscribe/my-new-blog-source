@@ -1,22 +1,39 @@
 ---
 layout: post
-title: 函数式反应式编程的崛起
+title: 函数式反应式编程
 comments: true
 categories: [design, programming]
 tags: [design, architecture, programming, concurrency, microservice]
 ---
 
-函数式编程早在几十年前就被提出出来却一直处于不温不火的境地，直到最近几年并发编程遇到了极大的挑战的情况下才重新引起人们的关注。
-流式编程或者响应式编程则是另外一个不断进入我们视线的设计概念；微服务架构的兴起则为两者的结合提供了更好的舞台，毕竟**无状态是微服务的潜在要求**也是最重要的一个要求之一。
-本文尝试深度探讨一下这一新的编程范式。
+流式编程或者响应式编程则是一个不断进入我们视线的设计概念；它采用声明式编程范式，并将数据流和数据更新的处理作为程序运算的核心。
+由于函数式编程本身即强调声明式编程，这使得用函数式编程的语言或者工具来实现响应式编程更自然清晰，
+一般人们将二者的结合称为函数式反应式编程或者FRP。
+FRP最早可以追溯到微软和耶鲁的两位先驱在97年发表的[论文](http://conal.net/papers/icfp97/icfp97.pdf),
 
 <!--more-->
 
 ## 基本概念
-首先从名字上看，函数式流式编程是一种复合的编程范式，可以简单看作是函数式编程加上流式编程。
 
-### 函数式编程
-函数式编程的概念并不新鲜，它的基本思路是上**程序的执行看作是一堆函数的组合处理和求值**过程；纯粹的函数式编程要求数据是不可变的，
+从基本思想上看，FRP本质上是以函数式编程思想为基础的。
+
+### 函数式编程的简单历史
+
+函数式编程早不是一个新鲜的概念，[在计算机历史的早期阶段就被提出](http://www.cse.psu.edu/~gxt29//historyOfFP/historyOfFP.html)和实现，
+可能是由于它和数学理论概念更接近，即使是有[Haskell这样的致力于提升影响力的开源项目](http://haskell.cs.yale.edu/wp-content/uploads/2011/02/history.pdf)在上个世纪八十年代被提出以解决不同的语言语义分裂的问题，
+也长期不能带其脱离“叫好不叫座”的尴尬境地，毕竟Unix/C的影响力太大了，以至于大部分人更喜欢面向过程的具体化思维，即使是一度流行的面向对象技术
+也得和传统的面向过程技术相结合才取得了长足的发展。
+
+进入21世纪以来，传统的依赖单核CPU频率提升的“摩尔定律”慢慢失效，软件的复杂性又与日俱增对计算能力的需求有增无减，
+原本用于大型机的多处理器核心被引入以应对商业软件领域的挑战。不幸的是传统的面向对象技术并不能很好地应对这些挑战;
+自然而然可以优雅地应对这些挑战的函数式编程技术重新引起人们的关注。
+
+微服务架构的兴起则为两者的结合提供了更好的舞台，因为**无状态是微服务的潜在要求**也是最重要的一个要求之一；
+函数式编程相较于其他编程范式更强调无副作用的编程思维，和微服务的基本要求自然契合的很好。
+
+### 函数式编程的基本概念 
+
+函数式编程的基本思路是将**程序的执行看作是一堆函数的组合处理和求值**过程；纯粹的函数式编程要求数据是不可变的，
 同样的数值输入在流经同样的函数处理的时候必须得到确定的输出，不容许有预料之外的副作用产生。程序员的任务可以想象为两个过程
 
 1. 声明运算过程所需要的函数及其组合算法；程序的主要逻辑是组合这些函数算法来完成运算
@@ -26,13 +43,18 @@ tags: [design, architecture, programming, concurrency, microservice]
 
 ### 流及反应式抽象
 
-流的抽象在计算机编程语言和基础计算机技术中非常常见。比如C++语言的早期STL标准库就提出了IO流的概念，它将输入输出设备进行抽象，
+流的抽象在计算机编程语言和计算机基础技术中非常常见。
+
+C++语言的早期STL标准库就提出了IO流的概念，它将输入输出设备进行抽象，
 外部用户仅仅需要关心自己的数据可以写入流中或者从流中读取，具体怎么实现底层的输入输出控制的细节则被标准IO流库所封装和隐藏。
+
 TCP协议的设计是另外一个例子，逻辑上看TCP服务的提供者和使用者之间在通信之前需要先建立一个虚拟的数据流，
 然后发送方可以**按照严格而固定的顺序**将数据写入这个数据流中，对方则可以保证按照发送发的写入顺序读取到数据。
 这里一个明显的共同特征是，流用于表述一种允许**生产者顺序往后追加，消费者可以依据同样顺序读取出数据**的逻辑抽象通道。
+只要逻辑通道处于连接状态，发送方就可以持续不断地向数据流中填充数据，接收方则可以得到保证不管中间经过多少节点（路由器或者交换机），
+数据总是以相同的顺序被放置在本地的协议栈缓冲中以便读取（这里暂不考虑网卡驱动丢包等异常情况）。
 
-其实 Unix 的管道也满足类似的特征，管道的输入端进程可以源源不断地将自己的标准输出信息重定向到给定的管道中，
+Unix 的管道也满足类似的特征，管道的输入端进程可以源源不断地将自己的标准输出信息重定向到给定的管道中，
 而管道另外一侧的进程则按照同样的顺序从管道里读取数据。
 
 这些例子中，流中的数据是一经产生即不会被修改的，并且多个不同的流其实可以或多或少按照某种方式去组合；譬如可以组合多个进程，
@@ -45,11 +67,87 @@ TCP协议的设计是另外一个例子，逻辑上看TCP服务的提供者和�
 ### 将两者相结合
 
 上述**流的抽象其实和函数式编程的基本要素可以无缝地融合**在一起，因为流的运算特征满足不可变性的特征，并且易于组合。
-两者的融合就可以成为是 **函数式反应式编程**。
+
+简单地说，FRP的核心思维方式是将**异步的数据流**作为基本的数据抽象，异步是为了解耦处理流的处理和参与者；
+作为编程模型的基本抽象，它支持用各种各样的方式来创建数据流，可以是一个外部的变量，也可以是图形界面点击事件，
+缓冲更新等等。
+
+基于该基本抽象，FRP还提供给使用者灵活的工具箱来处理流，使我们可以创建新的流、过滤已有的流、组合或者终结流的数据；
+显然这些操作手法是典型的函数式的，所不同的是**流被当作了基本的数据处理单元**，
+上述的这些操作都可以看作是作用于流的函数或者高阶函数。
+
+FRP的实现基本都依赖于基本的函数式编程特性，尽管各种编程语言不约而同地慢慢从函数式编程语言中汲取营养加入到新的版本中，
+或者没有历史兼容包袱（适合于一些新语言）地直接在语言核心加入函数式编程支持，
+
+在不同的编程语言中实现FRP面临的挑战也是不一样的。最有名的FRP实现是 [ReactiveX](http://reactivex.io/),
+下面我们来粗略看下不同的编程语言中的RFP实现和基本特征。
 
 ## Javascript
 
-**TBD**
+Javascript从早期版本开始就支持函数作为语言基本设施这一重要的函数式编程入门条件，在Javascript中实现FRP也比较清晰容易。
+
+想象一个简单的功能：我们需要在启动的时候从github中读取三个账户数据，用过程式的方法也很简单，
+但是我们这里想用FRP的方法来实现并顺便看下它的基本语义。
+
+首先我们需要先产生一个流，毕竟这是一切运算的基础，用ReactiveX 的说法我们需要一个 `Observable`，我们可以简单认为它就是一个流
+
+```javascript
+var requestStream = Rx.Observable.just('https://api.github.com/users');
+```
+
+这时候我们得到的还仅仅是一个字符串流；我们需要给它加上一些动作，当对应的数据被推送给流的时候，后续的运算可以继续进行下去
+
+```javascript
+requestStream.subscribe(function(requestUrl) {
+    // execute the request
+    var responseStream = Rx.Observable.create(function (observer) {
+        jQuery.getJSON(requestUrl)
+            .done(function(response) { observer.onNext(response); })
+            .fail(function(jqXHR, status, error) { observer.onError(error); })
+            .always(function() { observer.onCompleted(); });
+    });
+
+    responseStream.subscribe(function(response) {
+    // do something with the response
+    });
+}
+```
+
+上述代码中，我们用 `subscribe` 函数作为组合函数，对应的参数是一个函数，该函数会取到 `requestStream` 中的字符串URL，
+执行AJAX回调，并基于处理结果决定如何处理流，这里的 `create` 函数用于创建一个自定义的流，传入的 `observer` 为下游的stream (ReactiveX叫他`Observable`)。
+当AJAX异步执行成功或者出错的时候，上面的实现将对应的相应结果通知给下游，分别是
+
+- `onNext` 通知下一个数据需要被处理
+- `onError` 通知异常情况发生，遇到错误需要被处理
+- `onCompleted` 标记流的结束
+
+需要处理这些响应数据的代码写在第二个 `subscribe` 代码块中。 
+
+上面的代码中，我们在一个流的处理中嵌套了另外一个流的处理，写的多了很容易掉入 [Callback Hell](http://callbackhell.com/) 的陷阱。
+所幸的是，我们可以使用流变换的技术来简化它，重写为如下的版本 
+
+```javascript
+var responseMetastream = requestStream
+  .map(function(requestUrl) {
+      return Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));
+  });
+```
+
+这是函数式编程中基本的`map`函数 - 将一种数据经过运算后编程另外一种数据，这里麻烦的是我们的`map`默认就会将内部的返回类型封装为一个Stream,
+加上里面的返回值本身已经是一个 Stream，最终我们得到了一个封装了两次的stream，好在`flatMap`可以帮我们轻松解开一层封装
+ 
+```javascript
+var responseStream = requestStream
+  .flatMap(function(requestUrl) {
+    return Rx.Observable.fromPromise(jQuery.getJSON(requestUrl));
+});
+```
+
+实现的流处理过程如下图
+
+![js_rx_flatmap](https://camo.githubusercontent.com/0b0ac4a249e1c15d7520c220957acfece1af3e95/687474703a2f2f692e696d6775722e636f6d2f4869337a4e7a4a2e706e67)
+
+更复杂的功能可以参考[这篇gist](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)，文字和视频都很清晰易懂。
 
 ## Java8 基本流
 
@@ -310,3 +408,9 @@ lines | subscribe<string>(println(cout));
 
 回头看这里的代码，可以明显看到里面没有一个传统的过程式控制逻辑，没有分支、循环和判断，有的只是函数定义、调用和流连接操作。
 如果熟悉Rx系列库的API，处理逻辑还是比较清晰明了的。
+
+## 参考材料
+1. [The introduction to reactive programming you've been missing](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)
+2. [Conal's reply on "what's (functional) reactive programming](https://stackoverflow.com/questions/1028250/what-is-functional-reactive-programming/1030631#1030631)
+3. [RxJs](https://github.com/Reactive-Extensions/RxJS)
+4. [RxJava](https://github.com/ReactiveX/RxJava)
