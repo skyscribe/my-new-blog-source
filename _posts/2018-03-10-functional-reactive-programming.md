@@ -151,7 +151,11 @@ var responseStream = requestStream
 
 ## Java8 基本流
 
-**TBD**
+Java8在JDK中提供了丰富的 stream API，其定义是一个泛型的接口，支持最基本的流操作，包括 `map`/`flatMap`/`filter`/`skip`/`sorted`/`reduce`等方法。
+一个新的`stream`对象可以用包括静态的`of`方法、`Builder`辅助类构造出来，同时JDK提供的`Collection`类大多支持一个新的`stream()`方法用以构造一个新的stream对象。
+
+需要注意的是Java8语言本身的函数式支持是通过面向对象的方法来模拟的，只是从FRP编程的角度来看，可以认为Java8的流是用函数式思维组织设计，用OO的方法来提供实现。
+更多Java8的函数式特性和流实现细节记录在[这篇文章]({{ site.baseurl }} {% post_url 2016-10-14-fp-support-in-java8 %} )中。
 
 ## RxJava扩展
 
@@ -248,7 +252,7 @@ RxJava 支持从已有的数据结构中创建 `Observable`, 我们可以很方�
 
 #### 组合和变化 `Observable` 
 
-RxJava 支持我们方便地连接或者组合多个`Observable`, 考虑如下的代码
+RxJava 支持我们方便地连接或者组合多个`Observable`, 考虑如下的 groovy 代码
 ```groovy
 def simpleComposition() {
     customObservableNonBlocking()
@@ -263,13 +267,79 @@ def simpleComposition() {
 
 ![groovy_pipeline](https://github.com/Netflix/RxJava/wiki/images/rx-operators/Composition.1.png)
 
-## Spring
-
-**TBD**
-
 ## Kafka Streams
 
-**TBD**
+Kafka本身（可以参考[前一篇文字]( {{ site.baseurl }} {% post_url 2017-11-18-kafka-design-study %} )）就可以看作是一个流式处理平台。同时它还提供了专门的流处理API，其特性如下
+- Kafka Streams 本身是一个客户端的库，可以看作是一个用户端程序而不是其平台核心部分；它本身被设计为可以**很容易地嵌入到用户端的Java程序**中，方便部署和集成。
+除了Kafka平台本身，它不依赖于其他的库或者系统；同事又能依托于Kafka平台提供的可伸缩性和一致性保证提供高可靠的实时处理能力。
+
+- 支持流处理中插入自定义的本地状态，从而结合传统的过程式编程的本地状态的便利；当然破坏了纯函数性编程无状态的假设会带来复杂的问题，以提高性能；
+各种取舍需要用户自己去选择。
+
+- `Stream`是Kafka Streams提供的最重要的抽象，它表示无边界、持续更新的数据流；一个流是有序而可重放的，其中的数据是由按时间顺序的不可变的数据序列组成；
+其中的一条数据或者记录被定为为一个 `Key, Value` 对。
+
+- 建立在stream之上的应用程序可以看作是由一个或者流处理对象（stream processor）组成；这些流处理对象是高度可组合的，它们可以将一个或者多个流作为输入，
+经过一定的函数变换产生一个或者多个流对象输出。
+这里的两种例外情况是被称之为 `Source` 和 `Sink` 的处理对象；`Source`可以从Kafka平台中读取某个`Topic`作为输入经过处理后，产生新的数据流，
+而`Sink`可以从上游的流中拿到数据，作处理之后，将结果写入一个特定的`Topic`上。
+
+Kafka Stream的流处理拓扑结构如下图 
+
+![kafka_streams_topo](https://kafka.apache.org/10/images/streams-architecture-topology.jpg)
+
+### 两种流处理技术
+
+Kafka Streams提供了两种方法来操作流处理逻辑
+- 专门的[领域语言(DSL)](https://kafka.apache.org/10/documentation/streams/developer-guide/#streams_dsl) 提供了基于Steams的高级API来转换流；用户可以用这些API的组合来完成自己的应用程序逻辑。
+- 相对底层一些的 Processor API，适用于用户想自己定义自己的流处理逻辑的情况；这里我们只粗略看看DSL的特性和使用。
+
+DSL支持基于Streams和Table的抽象，有三个主要的接口
+- `KStream`是基本的数据流对象
+- `KTable`是一个二维表，可以方便地用在需要数据连接或者分组的情况
+- `GlobalKTable`是一个全局的表，其本身可以和Kafka的数据分块等能力结合起来用
+
+`KStream`用来表述流的概念，而后两者用来对应于数据表结构。基于 `StreamsBuilder` 类，我们可以很方便地将Kafka中的某个topic数据读加载到流中或者数据表中。
+这些接口提供了丰富的变换操作（方法），其中一些变换方法会产生一个新的`KStream`而另外一些则会产生新的`KTable`。
+从实现上看，这些接口都是用泛型技术实现的，并且是强类型的。
+
+所谓的流变换可以分为两类：无状态的后有状态的。无状态的变换支持诸如 `map`/`filter`/`flatMap`/`filterNot`/`foreach`/`groupByKey`/`selectByKey`/`toStream`等操作；
+其中`toStream`可以实现从`KTable`到`KStream`的转换；而`groupBy`则返回分组过的流或者数据表。
+有状态的变换除了将传入的流作为输入外，还需要一个额外的状态数据存储参与到变换处理过程中；
+比如一个`window`操作会在处理过程中读取`window`信息来确定输入流中的哪些数据应该被处理并将其结果放置在输出流中。
+
+有状态的流变换包含如下几种
+- 聚合
+- 连接操作(Join)，可以将其想象为SQL的表连接
+- 上述的window操作
+- 自定义的流处理变换操作，由于是自定义的所以可能是有状态的
+
+它们之间的关系可以参考下图
+
+![kafka_stateful_transformation_relation](https://kafka.apache.org/10/images/streams-stateful_operations.png)
+
+### 一个简单的例子
+
+下面是一个简答的Java8的程序，用于统计某个文本行中的词出现的次数
+```java
+// Assume the record values represent lines of text.  For the sake of this example, you can ignore
+// whatever may be stored in the record keys.
+KStream<String, String> textLines = ...;
+
+KStream<String, Long> wordCounts = textLines
+    // Split each text line, by whitespace, into words.  The text lines are the record
+    // values, i.e. you can ignore whatever data is in the record keys and thus invoke
+    // `flatMapValues` instead of the more generic `flatMap`.
+    .flatMapValues(value -> Arrays.asList(value.toLowerCase().split("\\W+")))
+    // Group the stream by word to ensure the key of the record is the word.
+    .groupBy((key, word) -> word)
+    // Count the occurrences of each word (record key).
+    // This will change the stream type from `KGroupedStream<String, String>` to
+    // `KTable<String, Long>` (word -> count).
+    .count()
+    // Convert the `KTable<String, Long>` into a `KStream<String, Long>`.
+    .toStream();
+```
 
 ## RxCpp
 
@@ -406,11 +476,30 @@ auto lines = linewindows
 lines | subscribe<string>(println(cout));
 ```
 
-回头看这里的代码，可以明显看到里面没有一个传统的过程式控制逻辑，没有分支、循环和判断，有的只是函数定义、调用和流连接操作。
+看这里的代码，可以明显看到里面没有一个传统的过程式控制逻辑，没有分支、循环和判断，有的只是函数定义、调用和流连接操作。
 如果熟悉Rx系列库的API，处理逻辑还是比较清晰明了的。
+
+## Reactive Spring
+
+[Spring 5.0 框架](https://www.infoq.com/news/2015/09/spring-43-5)的一个重心就是增加对FRP风格的架构的支持。
+Spring框架之所以流行，一个很重要的原因就是其易用而又性能极好的MVC框架可以很好地替代传统的servelet-API，虽然Spring MVC可以很好地解耦一部的HTTP请求，
+但是在不破坏既有框架的前提下增强非阻塞的IO模型却碰到了不少困难。另一方面，基于注解的MVC工具带来了更具可读性的代码和清晰的业务逻辑，
+Spring 5.0在尽力不破坏既有注解的前提下，实现了一个底层的Reactive Engine。
+
+同时Spring还发布了一个基于JVM平台的[反应式流处理规格说明](https://github.com/reactive-streams/reactive-streams-jvm/blob/v1.0.0/README.md#specification)，尝试将改编程范式在JVM平台上实现标准化。
+目前该规格致力于实现多种异步组件驱动在JVM平台之上的互操作性，[Flow接口](https://docs.oracle.com/javase/9/docs/api/java/util/concurrent/Flow.html)已经加入到Java9的中;
+它由4个接口，一些rule 以及一个TCK组成
+- `Publisher` 用于产生可以无固定边界的元素的序列，这些元素可以被发布给特定的订阅者
+- `Subscribe` 用于从`Publisher`中接收数据更新
+- `Subscription` 用于表述`Publisher`和`Subscriber`之间的订阅关系并可以对数据的处理做控制，有`request`和`cancel`方法
+- `Processor` 用于表述流处理的中间状态
+
+## 其它语言和平台
+对于其它编程语言环境和平台，微软的开源项目[Reactive Extensions](https://github.com/Reactive-Extensions)提供了丰富的支持。
 
 ## 参考材料
 1. [The introduction to reactive programming you've been missing](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754)
 2. [Conal's reply on "what's (functional) reactive programming](https://stackoverflow.com/questions/1028250/what-is-functional-reactive-programming/1030631#1030631)
 3. [RxJs](https://github.com/Reactive-Extensions/RxJS)
 4. [RxJava](https://github.com/ReactiveX/RxJava)
+5. [Kafka Streams: concepts](https://kafka.apache.org/10/documentation/streams/core-concepts)
