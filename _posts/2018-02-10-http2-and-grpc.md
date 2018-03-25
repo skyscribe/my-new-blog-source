@@ -286,10 +286,83 @@ HTTP/2通过`WINDOW_UPDATE`帧来施加控制。接收方告诉发方自己可�
 
 ### TLS的争议
 
-HTTP/2默认开启TLS并要求TLS1.2或者更高的版本，因为低版本的协议已经被证明在当前的环境下不够安全。
+HTTP/2默认开启TLS并要求TLS1.2或者更高的版本，较低版本的协议已经被证明在当前的环境下不够安全。
+尽管协议规范中没有强迫必须使用TLS，但包括Chrome、Firefox、Safari、IE、Edge等主流的浏览器实现都**仅仅支持基于TLS的HTTP/2**；
+从而使得开启TLS称为事实上的标准。
+
+另外还有一些批评的声音和加密、解密的计算资源开销密切相关；事实上许多HTTP流量并没有必须加密保护的必要，强制采用TLS带来了额外的性能开销。
+另一种批评的声音认为当前的安全机制仅仅是复用已有的证书框架，在一些小型的设备上当前的模型必须强迫周期性的进行证书的登记和有效期展期，
+这些操作都需要额外的开支而不是免费的。关于安全最后一个有名的争议是关于是否支持SMTP协议已经在使用的随机加密技术，
+这种技术可以防范被动监听行为，而[被动监听被RFC7258列为是安全攻击](https://tools.ietf.org/html/rfc7258)；所幸的是RFC8164在2017年5月被发布出来，解决来该不一致。
+
+### 浏览器之外的支持
+
+HTTP/2不仅仅被作为前后端之间的API接口，就如HTTP协议被广泛应用于后端服务之间的接口一样，HTTP/2协议也被一些基础设施软件、中间件所广泛支持。
+
+HTTP服务器软件上，Apache 2.4.12通过mod_h2的方式添加了对HTTP/2的支持，老的mod_spdy已经被停止开发和维护；
+Tomcat从8.5版本开始也加入了支持HTTP/2的阵营，只是需要修改些许配置；
+提供高可用和负载均衡服务的HAProxy在1.8版本中加入了对HTTP/2的支持；
+轻量级的嵌入应用服务器Jetty则从9.3版本中加入了对HTTP/2的支持；同时该版本也需要JDK8以上才能支持。
+高性能的异步网络编程框架Netty从4.1版本开始支持HTTP/2。
 
 ## gRPC
 
+HTTP/2的诞生给了软件架构方面新的可能性。传统的微服务架构基于HTTP协议随处可得的现状，选择了HTTP协议和RESTful API作为服务间通信的协议；
+受制于传统的HTTP协议单向请求、响应的通信模型，两个服务之间的通信如果有双向的（互相访问对方提供的服务），则不得不发起两条请求，
+并要求双方同时扮演服务器和客户端的角色，给架构带来了额外的复杂性。RESTful API的默认同步、顺序特性迫使设计过程中有时候不得不绕开这一基本协议，
+采用消息队列的方式做反向通信；遇到性能问题的时候，则不得不花费大力气去优化。
+
+gRPC是Google发明的一套使用HTTP/2的全部能力的基于RPC语义的协议，得益于HTTP/2所支持的服务端推送功能，它可以用一条持久连接同时支持请求、响应逻辑
+和双向的消息流。
+
+### RPC语义
+
+RPC是一种存在很久的技术，它的基本思路是跨越网络进行过程调用；服务使用方（客户端）准备好过程调用的参数，然后发起一个本地调用（类似于一个函数调用），
+然后本地的一个服务桩则将对应的调用信息封装成网络消息，并将请求发送给真正的服务端；服务端随后可以解析收到的请求，
+在服务提供方自己的机器上完成运算，然后将结果封装为消息返回。此时服务使用方的桩调用往往处于阻塞状态，
+在收到返回消息后，它再完成消息的反序列化和结构化，然后将结果返回给上层。
+
+传统的RPC框架往往需要自己手工写大量的代码，处理诸如网络异常、消息收发调度等和具体过程调用逻辑无关的代码才能顺利使用RPC。
+gRPC则抽象了这些底层细节，用protobuf的格式来定义过程请求的语义，用HTTP/2做高效的传输层，使应用层仅仅通过使用protobuf格式定义自己的服务原语，
+框架则可以自动生成上述这些繁琐的代码，而服务使用者仅仅需要关注自己的领域逻辑即可。
+
+![grpc_req_resp](https://grpc.io/img/landing-2.svg)
+
+gRPC框架本身是跨平台、跨语言的，这使得它很容易成为微服务架构下服务之间的接口。它的服务交互方式是基于RPC的，
+和传统的SOA中的Web Service的方式有些相近而和基于RESTful的架构风格截然不同。两者没有绝对的有略，而是各自有其适用的场景。
+从性能上来看，gRPC采用更紧凑的编码和领域相关的逻辑来描述服务接口，和传统的SOA中的WSDL也有明显的不同；
+前者和微服务架构的基本设计哲学是匹配的，而后者的接口仍然是哑接口，仅仅侧重于消息交换而不是领域逻辑（之前[一篇文字]({{ site.baseurl }} {% post_url 2017-08-29-thinking-on-service-architecture %})探讨了微服务设计）。
+
+gRPC其实定义了一种自己的[DSL](https://en.wikipedia.org/wiki/Domain-specific_language)来描述服务语义，只是它的语法和概念比WSDL要简化的多。
+因为protobuf本身就是定位于跨语言之间的信息交换的中间格式，gRPC仅在protobuf语法的基础上增加了`service`和`rpc`关键字。
+声明一个最简单的请求、响应服务的定义如下
+
+```
+// The greeter service definition.
+service Greeter {
+    // Sends a greeting
+    rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+    string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+    string message = 1;
+}
+```
+
+服务提供方和使用者两边都需要持有上述的服务定义，然后利用已有的protobuf编译器可以生成目的平台编程语言对应的代码；
+领域逻辑代码需要将生成的代码加入到代码库中，调用或者扩展生成的类/结构即可。
+目前gRPC支持11种语言环境，细节见[这里](https://grpc.io/docs/)
+
+### 双向流
+gRPC封装了HTTP/2协议的服务端推送功能，并提供了丰富的流功能，包括客户端发起的数据流服务，服务端发起的流服务，以及双向的流服务。
+
+**TBD**
 
 ## 参考
 1. [How does HTTP/2 solve the Head of Line blocking (HOL)](https://community.akamai.com/community/web-performance/blog/2017/08/10/how-does-http2-solve-the-head-of-line-blocking-hol-issue)
