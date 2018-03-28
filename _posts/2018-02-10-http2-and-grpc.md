@@ -315,6 +315,12 @@ HTTP/2的诞生给了软件架构方面新的可能性。传统的微服务架�
 gRPC是Google发明的一套使用HTTP/2的全部能力的基于RPC语义的协议，得益于HTTP/2所支持的服务端推送功能，它可以用一条持久连接同时支持请求、响应逻辑
 和双向的消息流。
 
+### Protobuf编码
+
+gRPC采用广泛使用的Protobuf来编码过程调用信息，它本质上是一种可变长编码方式，内部用固定的标签、类型、域位置信息来编码基本的消息结构，
+提供有效的信息压缩的同时兼顾了编解码的效率；客户端和服务端用于编解码的开销和JSON相差不大，而编码出来的二进制数据则必JSON要紧凑很多，
+大概仅相当于基于SOAP的WSDL消息的几分之一。
+
 ### RPC语义
 
 RPC是一种存在很久的技术，它的基本思路是跨越网络进行过程调用；服务使用方（客户端）准备好过程调用的参数，然后发起一个本地调用（类似于一个函数调用），
@@ -360,12 +366,84 @@ message HelloReply {
 目前gRPC支持11种语言环境，细节见[这里](https://grpc.io/docs/)
 
 ### 双向流
-gRPC封装了HTTP/2协议的服务端推送功能，并提供了丰富的流功能，包括客户端发起的数据流服务，服务端发起的流服务，以及双向的流服务。
 
-**TBD**
+gRPC封装了HTTP/2协议的服务端推送功能，并提供了丰富的流功能，包括客户端发起的数据流服务，服务端发起的流服务，以及双向的流服务。
+调用的发起过程总是由客户端发起调用，提供服务方法和元数据;服务端在收到请求之后，可以依据流的类型发出元数据、响应消息等。
+
+对于服务端发起的流处理服务，服务端在收到客户端的请求之后，直接将响应消息依次写入到输出流中；这时候客户端已经准备好接收消息了，
+只需要依次从流中读取即可。客户端发起的流服务的处理是类似的，所不同的是这时候客户端可以依次写入多条请求，
+而服务端往往仅需要在处理请求的过程中，发送一条响应即可；大部分情况下，**响应消息在处理完最后一个请求的时候发出**。
+
+
+所谓的双向流是指它的RPC服务方的接口接受一个流作为输入，同时返回的结构又是另外一个流，逻辑上有两个相互独立的流用作两者之间的通信。
+流的发起方（客户端或者服务端）可以根据应用逻辑不断地往流中写入消息，接收方就可以依次按顺序读取其中的消息。
+具体怎样去处理流中收到的消息以及如何将两个流中的数据关联起来，完全依赖于应用层的实际，gRPC本身支持丰富的场景
+- 服务端可以在收全所有的客户端流中的数据之后，再往客户端的流（输出流）中写入数据
+- 服务端也可以每收到一条数据，就做出相应业务处理，并将处理结果写入到客户端的流，实现类似Reactor的模式
+
+流的定义是通过一个额外的`stream`关键字来指明的，如下面的例子
+```
+//服务端流
+rpc manyReplies(Request) returns (stream Response){
+}
+
+//客户端流
+rpc manyRequests(stream Request) return (Response) {
+}
+//双向流
+rpc bidirectionalRequests(stream Request) return (stream Response) {
+}
+```
+
+具体stream的实现是和编程语言相关的，在Java中它是通过`StreamObserver<T>`来抽象stream对象的，它支持常见的流操作接口
+- `onNext`方法实现往流中追加消息
+- `onCompleted`则会结束流
+
+一个双向聊天的服务端实现如下
+```java
+@Override
+public StreamObserver<RouteNote> routeChat(final StreamObserver<RouteNote> responseObserver) {
+    return new StreamObserver<RouteNote>() {
+        @Override
+        public void onNext(RouteNote note) {
+            List<RouteNote> notes = getOrCreateNotes(note.getLocation());
+
+            // Respond with all previous notes at this location.
+            for (RouteNote prevNote : notes.toArray(new RouteNote[0])) {
+                responseObserver.onNext(prevNote);
+            }
+
+            // Now add the new note to the list
+            notes.add(note);
+        }
+
+        @Override
+        public void onError(Throwable t) {
+            logger.log(Level.WARNING, "Encountered error in routeChat", t);
+        }
+
+        @Override
+        public void onCompleted() {
+            responseObserver.onCompleted();
+        }
+    };
+}
+
+```
+### 超时控制和RPC终止
+
+在微服务架构下，一个客户端的请求往往需要经历多个微服务节点的处理才能最终完成处理返回响应，如果中间某个服务节点宕机无法提供服务，
+那么后续从错误中恢复出来后再向下游节点重新请求就会失去意义。
+gRPC通过内置的超时控制机制来简化应用层的逻辑复杂度
+- 服务的调用方可以指定一个RPC必须终止的最长时间
+- 服务端则会在调用RPC之前先检查给定的服务调用是否已经超时，或者剩余多少时间可以用于调用本身
+- 如果已经超时，就会直接返回错误而不是继续调用服务实现
+
+gRPC正在崛起为新的微服务基础设施之一，甚至可以和传统的微服务基础设施HTTP/RESTful API并驾齐驱，越来越多的基础软件加入到了支持gRPC的行列。
 
 ## 参考
 1. [How does HTTP/2 solve the Head of Line blocking (HOL)](https://community.akamai.com/community/web-performance/blog/2017/08/10/how-does-http2-solve-the-head-of-line-blocking-hol-issue)
 2. [SPDY: an experiemental protocol for a faster web](https://www.chromium.org/spdy/spdy-whitepaper)
 3. [RFC7540](https://tools.ietf.org/html/rfc7540)
 4. [Distributed Programming Book: gRPC](http://dist-prog-book.com/chapter/1/gRPC.html)
+5. [gRPC core concpets](https://grpc.io/docs/guides/concepts.html)
