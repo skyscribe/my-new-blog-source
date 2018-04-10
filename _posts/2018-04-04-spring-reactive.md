@@ -209,4 +209,109 @@ Spring-WebFlux框架提供了默认的实现以保证这些Bean是开箱即用�
 - 上述的Result会被`HandlerResultHandler`所处理以便产生Response并将Response送给View层去渲染，或者直接返回给客户端
 
 #### Controller
-TBD
+传统的Spring MVC框架下应用程序仅仅需要按照业务逻辑划分，分别写好Controller，并用注解来指明某个方法需要处理的方法，带入请求作为参数，即可指定自己的参数校验Bean，
+Spring框架会自动帮我们完成参数校验到请求分发这一系列背后的复杂处理。这些已有的注解在Reactive方式下仍然被完美地支持。
+
+传统的这些注解都继续被用同样的方式所支持
+- `@RestController` 标注一个POJO是一个controller类
+- `@PostMapping/@PutMapping/@GetMapping...`可以加注在方法上，Spring可以自动发现他们用来处理对应的Web方法请求，注解中的参数可以用于携带URL等
+- `@ResponseStatus`可以用来指定HTTP返回的状态码
+- `@PathVariable`可以用于将URL中的参数传入进来绑定到Java类型的参数上，甚至正则表达式也可以被处理
+- 媒体类型的注解也可以放置在方法注解的参数中
+这些注解的用法和意图都和传统的Sping MVC没什么两样，这里无需赘述。
+
+#### 函数式的端点
+
+Spring WebFlux提供了新的基于函数变换的Web处理端点，它的基本逻辑是基于函数式的不可变设计的。虽然和上述传统的基于注解的方式看起来有很多差异，
+两者却是可以完美地运行在同样的底层服务实现上的。
+
+和`HandlerFunction`相对应的处理HTTP请求的handler函数通常接收一个HTTP请求作为输入，并产生一个`Mono<ServerResponse>`作为处理的输出。这样的一个函数
+作用上和一个声明了`@RequestMapping`的方法类似，不同的是`ServerRequest`和`ServerResponse`都被设计为是符合不可变对象的约束。
+访问一个请求中的内容的方法通过`bodyToXXX`的方式来实现，比如
+```java
+Mono<String> string = request.bodyToMono(String.class);
+```
+就可以返回一个将会产生一个字符串作为输出事件的发布者。
+
+类似地，我们也可以使用`bodyToFlux`返回一个`Flux`的封装，两者在底层上都是通过一个更灵活的`body(BodyExtractor)`方法来实现的。
+`bodyToMono`其实等价于`body(BodyExtractors.toMono(String.class)`。
+
+如果需要叠加对响应消息的额外处理，使用流的方式则可以用一个`Builder`对象来完成，因为`ServerResponse`本身是不可变的。
+用lambda表达式的方式写一个简单的Hello程序，可以是
+```java
+HandlerFunction<ServerResponse> helloWorld =
+    request -> ServerResponse.ok().body(fromObject("Hello World"));
+```
+当然这样的书写方式有潜在的可读性丢失的损耗。另外一种推荐的做法是，将不同的handler仍然聚合到一个controller类中，然后用不同的方法来组合实现不同的处理，
+下面是一个更复杂的例子
+```java
+public class PersonHandler {
+    private final PersonRepository repository;
+
+    public PersonHandler(PersonRepository repository) {
+        this.repository = repository;
+    }
+
+    public Mono<ServerResponse> listPeople(ServerRequest request) { 
+        Flux<Person> people = repository.allPeople();
+        return ServerResponse.ok().contentType(APPLICATION_JSON).body(people, Person.class);
+    }
+
+    public Mono<ServerResponse> createPerson(ServerRequest request) { 
+        Mono<Person> person = request.bodyToMono(Person.class);
+        return ServerResponse.ok().build(repository.savePerson(person));
+    }
+
+    public Mono<ServerResponse> getPerson(ServerRequest request) { 
+        int personId = Integer.valueOf(request.pathVariable("id"));
+        Mono<ServerResponse> notFound = ServerResponse.notFound().build();
+        Mono<Person> personMono = this.repository.getPerson(personId);
+        return personMono
+            .flatMap(person -> ServerResponse.ok().contentType(APPLICATION_JSON).body(fromObject(person)))
+            .switchIfEmpty(notFound);
+    }
+}
+```
+
+#### 路由处理函数
+
+通常情况下，我们不需要自己写路由函数，仅仅需要调用`RouterFunctions.route(RequestPredicate, HandlerFunction)`做分发就可以了。
+如果第一个参数指定的谓词判断匹配进来的HTTP请求，那么第二个参数指定的HandlerFunction就会被调用，并将请求传入，正如上面例子中一个一个的public方法所做的那样。
+如果没有找到匹配的，则直接返回404(即上例中的`notFound`)。
+
+多个路由函数可以通过函数式编程的组合方法构造出新的路由函数来。匹配的时候，先比对第一个函数，如果没有匹配再一次往下顺序比对和处理。
+我们可以使用`RouterFunction.and(routeFunction)`或者`or`来组合多个条件判断，用`andRoute`来组合多个路由函数，写出的代码是比较清晰易懂的流畅风格。
+基于上面的例子，使用路由函数的组合如下
+```java
+PersonRepository repository = ...
+PersonHandler handler = new PersonHandler(repository);
+
+RouterFunction<ServerResponse> personRoute =
+    route(GET("/person/{id}").and(accept(APPLICATION_JSON)), handler::getPerson)
+        .andRoute(GET("/person").and(accept(APPLICATION_JSON)), handler::listPeople)
+        .andRoute(POST("/person").and(contentType(APPLICATION_JSON)), handler::createPerson);
+```
+每一行一个路由函数的方式具有很强的不言自明性，不需要稳定仅仅通过读这段代码就可以知道每个URL是怎样被某个函数所处理了。
+
+由于这里的主要编程范式是函数式的，Spring库提供的大部分组合函数都是静态函数，这里的方法引用逻辑借助于Java8的语法特性进一步提高了lambda表达式的表达能力。
+这也许是这些新特性都仅仅在Java8平台下才能工作的原因。
+
+#### 启动Server和过滤器
+
+启动一个后端Web服务器的方法和前面的类似，只是我们需要构造一个`HttpHandler`出来；实现的方法是通过`RouterFunctions.toHttpHandler(routerFunction)`;
+构造出来的HttpHandler就可以被用相同的方法调用特定的后端服务器实现了。
+
+过滤器可以用在`routerFunction`组合之间，提供额外的安全控制和拦截器处理。譬如如下的使用`SecurityManager`的例子
+```java
+RouterFunction<ServerResponse> filteredRoute =
+    route.filter(request, next) -> {
+        if (securityManager.allowAccessTo(request.path())) {
+            return next.handle(request);
+        }
+        else {
+            return ServerResponse.status(UNAUTHORIZED).build();
+        }
+    });
+```
+当给定的请求可以被安全策略放行的时候，我们可以直接调用`next.handle(request)`将其交给下游，否则直接构造一个授权错误的响应，结束该请求的处理流程。
+
