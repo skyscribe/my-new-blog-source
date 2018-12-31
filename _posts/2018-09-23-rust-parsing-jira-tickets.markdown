@@ -154,6 +154,7 @@ pub struct QueryResult<T> {
     pub issues: Vec<T>,
 }
 ```
+
 最后一个字段稍微有些复杂是因为程序中有多个不同条件的查询，返回的结构可能是不一样的，`serde_json`
 可以支持**用泛型的方法来定制可扩展的抽象类型**。内部泛型中指定lifetime的做法在这里显得特别突兀，
 但是暂时也没有更优雅的办法，因为出于效率的考虑，默认的Rust数据结构是具有移动语义的，
@@ -166,7 +167,7 @@ pub struct QueryResult<T> {
 Rust本身提供了丰富的函数式操作类型，并有强大的 `iterator`抽象了丰富的操作组合，但是某些稍微复杂一点的处理还是需要不少重复劳动；
 `itertool`这个工具库提供不少高级的功能；对于熟悉函数式编程的程序员来说，这一高级工具不容错过。比如下面这个是过滤其中某个特定领域的条目病按照某个给定条件分组之后再行统计规划状态的例子
 
-```Rust
+```rust
 //check planning status
 let mut planned = 0;
 let mut unplanned = 0;
