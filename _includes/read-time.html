@@ -1,4 +1,4 @@
-{% assign words_per_minute = site.words_per_minute | default: 200 %}
+{% assign words_per_minute = site.words_per_minute | default: 400 %}
 
 {% if post.read_time %}
   {% assign words = post.content | strip_html | strip_newlines | size %}
@@ -6,8 +6,14 @@
   {% assign words = page.content | strip_html | strip_newlines | size %}
 {% endif %}
 
+{% if post.date %}
+  {%assign the_date = post.date | date: '%Y-%m-%d' %}
+{% elsif page.date %}
+  {%assign the_date = page.date | date: '%Y-%m-%d' %}
+{% endif %}
+
 {% comment %} TODO: move those to ui_data text? {% endcomment %}
-本文有 {{words}} 字，大约需要 {{words || divided_by:words_per_minute }} 分钟可以读完
+本文有 {{words}} 字，大约需要 {{words || divided_by:words_per_minute }} 分钟可以读完, 创建于 {{ the_date }}
 
 {% comment %}
     {% if words < words_per_minute %}
