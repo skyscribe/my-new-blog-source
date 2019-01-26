@@ -198,7 +198,7 @@ return Optional.ofNullable(someObj.doSth())
 ### 隐藏在Optional中的模式
 从上面的示例代码可以看出，Optional类其实提供了关于一些基本过程逻辑的封装，使得使用者可以**站在更高的层次写代码**，关于一些基本的分支判断等过程逻辑控制，Optional提供了一些模式给程序员来调用，使得程序员可以更加关注在业务逻辑上，减少程序语言的底层实现细节的纠缠，同时又**不丢失静态语言带来的编译器检查**的便利。
 
-当然Optional类型本身是一个封装类，作为函数式编程中的一个模式在Haskell中它是[一种具体的`Monad`抽象]({{ site.baseurl }}{% link _posts/2012-04-15-haskell-functor-and-monad.markdown %})，其提供的方法提供了各种各样关于封装对象的高层操作，包括过滤器/映射/异常处理等，可以实现更复杂而高级的操作，这里不再赘述；细节可参考Optional的使用。
+当然Optional类型本身是一个封装类，作为函数式编程中的一个模式在Haskell中它是[一种具体的`Monad`抽象]({{ site.baseurl }}{% link _posts/2012-2014/2012-04-15-haskell-functor-and-monad.markdown %})，其提供的方法提供了各种各样关于封装对象的高层操作，包括过滤器/映射/异常处理等，可以实现更复杂而高级的操作，这里不再赘述；细节可参考Optional的使用。
 
 ### Java8的 Type Annotation
 其实在Java8中，新引入的类型注解针对空指针问题提供了另外的处理方式，即通过指定`@Nonnull`，编译器可以用于检测某个代码路径中有可能接受到空指针的情况，从而避免程序员处理空指针异常。IntelliJ IDEA提供了贴心的提示建议插入这个annotation从而帮助我们写出更整洁的代码。

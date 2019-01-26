@@ -1,7 +1,7 @@
 #!/bin/bash
 deployDir=$(pwd)/_deploy
 siteDir=$(pwd)/_site
-siteUrl=https://github.com/skyscribe/skyscribe.github.io.git
+siteUrl=git@github.com:skyscribe/skyscribe.github.io.git
 
 function setup() {
     rm -fr $deployDir
