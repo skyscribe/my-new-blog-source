@@ -89,7 +89,7 @@ HTTP/1.1通过默认将底层连接设置为持久性连接来解决这个问题
 HTTP/1.0以及1.1在当时的互联网应用场景下是合适而成功的设计；它简单的基于文本的协议定义和容易理解的请求/响应模型取得了巨大的成功，
 大量的企业系统架构采用了HTTP协议并取得了市场上的成功；基于HTTP协议加上应用架构的演进，后续出现了依次为基础的复杂技术，
 如致力于优化前端逻辑的AJAX、基于XML+SOAP+WSDL的SOA技术（也成为Big Web Service）；以及回归HTTP协议原本并增加丰富媒体资源描述访问的
-RESTful API，后者成为了微服务设计的基本通信协议(更多思考见[这篇文字]({{site.baseurl }} {% post_url 2017-08-29-thinking-on-service-architecture %}))。
+RESTful API，后者成为了微服务设计的基本通信协议(更多思考见[这篇文字]({{site.baseurl }} {% post_url 2015-2017/2017-08-29-thinking-on-service-architecture %}))。
 
 任何事物在长期的发展过程中都会呈现两面性；随着构建于HTTP之上的应用逻辑和架构变得日益复杂，HTTP协议的一些不适应的地方也
 引起了社区的诟病。
@@ -337,7 +337,9 @@ gRPC则抽象了这些底层细节，用protobuf的格式来定义过程请求�
 gRPC框架本身是跨平台、跨语言的，这使得它很容易成为微服务架构下服务之间的接口。它的服务交互方式是基于RPC的，
 和传统的SOA中的Web Service的方式有些相近而和基于RESTful的架构风格截然不同。两者没有绝对的有略，而是各自有其适用的场景。
 从性能上来看，gRPC采用更紧凑的编码和领域相关的逻辑来描述服务接口，和传统的SOA中的WSDL也有明显的不同；
-前者和微服务架构的基本设计哲学是匹配的，而后者的接口仍然是哑接口，仅仅侧重于消息交换而不是领域逻辑（之前[一篇文字]({{ site.baseurl }} {% post_url 2017-08-29-thinking-on-service-architecture %})探讨了微服务设计）。
+前者和微服务架构的基本设计哲学是匹配的，而后者的接口仍然是哑接口，仅仅侧重于消息交换而不是领域逻辑（之前[一篇文字]
+({{ site.baseurl }} {% post_url 2015-2017/2017-08-29-thinking-on-service-architecture %})
+探讨了微服务设计）。
 
 gRPC其实定义了一种自己的[DSL](https://en.wikipedia.org/wiki/Domain-specific_language)来描述服务语义，只是它的语法和概念比WSDL要简化的多。
 因为protobuf本身就是定位于跨语言之间的信息交换的中间格式，gRPC仅在protobuf语法的基础上增加了`service`和`rpc`关键字。

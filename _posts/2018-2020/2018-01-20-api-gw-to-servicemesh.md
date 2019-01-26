@@ -190,7 +190,7 @@ Conduit的设计目标包括
 - 重用Linkerd设计中踩的一些"坑"
 
 Conduit采用和lstio类似的设计，并处于安全和性能的考虑，这次不再执着于JVM平台而是用Rust语言重写数据平面；
-关于Rust为什么可以做到更安全的编程，可以参考之前[这篇文字]({{site.baseurl }} {% post_url 2015-11-28-rust-language-quick-overview %})。
+关于Rust为什么可以做到更安全的编程，可以参考之前[这篇文字]({{site.baseurl }} {% post_url 2015-2017/2015-11-28-rust-language-quick-overview %})。
 控制平面则选用了更适合云计算基础应用的Golang来开发；并刻意保证两者都有很高的性能。
 
 一个随之而来的问题是，作为同一个组织推出的2个类似产品，两者是否会互相竞争？

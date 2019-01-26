@@ -155,7 +155,7 @@ Java8在JDK中提供了丰富的 stream API，其定义是一个泛型的接口�
 一个新的`stream`对象可以用包括静态的`of`方法、`Builder`辅助类构造出来，同时JDK提供的`Collection`类大多支持一个新的`stream()`方法用以构造一个新的stream对象。
 
 需要注意的是Java8语言本身的函数式支持是通过面向对象的方法来模拟的，只是从FRP编程的角度来看，可以认为Java8的流是用函数式思维组织设计，用OO的方法来提供实现。
-更多Java8的函数式特性和流实现细节记录在[这篇文章]({{ site.baseurl }} {% post_url 2016-10-14-fp-support-in-java8 %} )中。
+更多Java8的函数式特性和流实现细节记录在[这篇文章]({{ site.baseurl }} {% post_url 2015-2017/2016-10-14-fp-support-in-java8 %} )中。
 
 ## RxJava扩展
 
@@ -269,7 +269,7 @@ def simpleComposition() {
 
 ## Kafka Streams
 
-Kafka本身（可以参考[前一篇文字]( {{ site.baseurl }} {% post_url 2017-11-18-kafka-design-study %} )）就可以看作是一个流式处理平台。同时它还提供了专门的流处理API，其特性如下
+Kafka本身（可以参考[前一篇文字]( {{ site.baseurl }} {% post_url 2015-2017/2017-11-18-kafka-design-study %} )）就可以看作是一个流式处理平台。同时它还提供了专门的流处理API，其特性如下
 - Kafka Streams 本身是一个客户端的库，可以看作是一个用户端程序而不是其平台核心部分；它本身被设计为可以**很容易地嵌入到用户端的Java程序**中，方便部署和集成。
 除了Kafka平台本身，它不依赖于其他的库或者系统；同事又能依托于Kafka平台提供的可伸缩性和一致性保证提供高可靠的实时处理能力。
 
