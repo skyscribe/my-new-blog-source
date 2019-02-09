@@ -1,0 +1,27 @@
+@startuml clean architecture
+title structure of a clean architecture
+
+class Presenter {
+    //something
+}
+class UseCaseOutputPort << Interface >> {
+
+}
+class UseCaseInteractor {
+
+}
+class UseCaseInputPort << Interface >>  {
+
+} 
+class Controller {
+
+}
+hide members
+hide circle
+
+Presenter -right-|> UseCaseOutputPort
+UseCaseInteractor -up-> UseCaseOutputPort
+UseCaseInteractor-down-|> UseCaseInputPort  
+Controller -right-> UseCaseInputPort 
+
+@enduml
