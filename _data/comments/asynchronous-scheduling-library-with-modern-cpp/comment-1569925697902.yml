@@ -1,0 +1,7 @@
+_id: 2ec7e550-e436-11e9-a26f-c186e96c47eb
+message: 个人认为，最后的“异步阻塞”应该是“同步阻塞”，因为感觉和直接调用call的效果差不多。。。只是个人见解，欢迎交流～
+name: BOT Man
+email: ab47f1dd7d76ae6ea09194fb9facc633
+url: 'https://bot-man-jl.github.io/articles/?post=2019/IO-Models'
+hidden: ''
+date: '2019-10-01T10:28:17.902Z'
