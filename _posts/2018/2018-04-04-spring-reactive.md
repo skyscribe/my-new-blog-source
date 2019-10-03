@@ -7,7 +7,7 @@ tags: [design, architecture, programming, microservice, spring]
 ---
 
 流式编程在微服务架构风格越来越流行的背景下日益引起开发者的关注
-([前文有一些简单探讨]({{ "/" | relative_url  }}{% post_url 2018-2020/2018-03-10-functional-reactive-programming %} ))
+([前文有一些简单探讨]({{ "/" | relative_url  }}{% post_url 2018/2018-03-10-functional-reactive-programming %} ))
 ，新的Java语言规范加入了流的概念从语言库上添加了对FRP的支持。
 Spring最新的[5.0版本](https://spring.io/blog/2018/02/19/spring-framework-5-0-4-available-now)更新也顺应这一潮流，加入了原生支持FRP的行列。
 
