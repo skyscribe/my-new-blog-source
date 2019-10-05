@@ -504,7 +504,33 @@ imagefs.available<15%
 ### GPU和Device Plugin
 除了常见的CPU和内存资源外，Kubernetes平台也提供了灵活的**插件化机制来分配和管理特殊的**资源，诸如GPU、FPGA等非常规资源。
 
+#### GPU
+对用户的诉求来说，支持GPU就相当于一旦再**POD里面添加了需要的GPU个数信息**，Kubernetes为用户创建的容器里面就自动出现对应的GPU设备和目录。
+比如对于Nvidia的GPU来说，容器里需要由
+1. GPU设备，比如/dev/nvdia0/
+2. GPU驱动程序，如/usr/local/nvidia/*
 
+Kubernetes里面并没有出现一个字段叫`gpu`,而是使用了一个抽象的叫做`extended resource`的字段来表述这类信息
+```yaml
+containers:
+- name: xxxx
+  image: "xxxx.xxx/imagex..."
+  resource:
+    limites:
+      nvidia.com/gpu:1
+```
+
+而提供GPU资源的宿主机上，我们需要利用`Node`对象的Status字段，使用**Patch的方式对它进行更新，加上自定义的资源数目信息**。
+幸好这这似乎一个概念上的步骤，实际的方案中，会有Device插件来负责完成维护。
+
+#### Device Plugin的工作原理
+对任意一种Device，都需要有一个关联的插件来负责维护和监控可用资源的变化。该插件会通过gRPC协议和kubelet组件连接起来，通过`ListAndWatch`API来**定期汇报Node上的设备的列表**。
+
+kubelet组件在得到这个列表之后，就会直接在它发给API Server的心跳消息里面，用Extended Resource的方式来加上这些设备的数量。
+这种处理机制是**和具体设备特性无关的**，因此不仅限于GPU，还适用于其它类型的设备。目前社区里已经有的插件还包括
+- FPGA
+- SRIOV
+- RDMA等
 
 ## 总结
 作为资深的Kubernetes开发人员，张磊提供了一个百科全书式的深入浅出的介绍，既有**深度探索实现机制的例子**又有各种可选方案的理论特色的介绍。
