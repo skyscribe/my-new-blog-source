@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 重学Kubernetes - 学张磊的《深度剖析Kubernetes》
+title: 重学Kubernetes - 读张磊的《深度剖析Kubernetes》
 comments: true
 categories: [study, notes, tools, architecture]
 tags: [kubernetes,notes,engineering,tools,container]
@@ -73,7 +73,10 @@ Docker技术虽然脱胎于旧有的容器技术，它本身却和老的基于LX
 - 多个服务实例之间的服务发现、负载均衡、扩展、发布和升级
 - 其它高级功能如日志、监控、熔断、限流等
 
-基于Google自身从Borg到Omega再到开发Kubernetes系统的长期的基础设施虚拟化管理经验，Kubernetes项目本身采用了完全基于声明式API的做法来构建一个极度强调灵活性的基础平台
+基于Google自身[从Borg到Omega再到开发Kubernetes系统](https://storage.googleapis.com/pub-tools-public-publication-data/pdf/44843.pdf)
+的长期的基础设施虚拟化管理经验(参加前面的[笔记](({{"/" | relative_url }}{% post_url 2019/2019-07-21-from-borg-to-kubernetes %})))，
+Kubernetes项目本身采用了完全基于声明式API的做法来
+构建一个极度强调灵活性的基础平台
 - 其主要系统都是基于Object来建模的，并且对各种Object提供了丰富的REST API
 - 内部各种Object之间使松散耦合的
 - 请求改变状态的指令使通过**提交一个Object的目标状态**给Kubernetes平台来实现的
